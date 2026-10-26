@@ -1,3 +1,6 @@
+import { pipelineOrchestrator } from '../pipeline/pipelineOrchestrator';
+import { ExistingIncidentCandidate } from '../pipeline/stages/match';
+
 export interface IAIAnalysisResult {
   category: string;
   categoryConfidence: number;
@@ -17,7 +20,14 @@ export interface IAIAnalysisResult {
     clusterCandidateId?: string;
     similarityScore: number;
     matchReason?: string;
+    matchedGrievanceId?: string;
+    matchedTrackingId?: string;
+    evidence?: any;
   };
+  scoreBreakdown?: any;
+  routeRecommendation?: any;
+  triggeredAlerts?: any[];
+  pipelineTelemetry?: any[];
   engineMode: string;
 }
 
@@ -107,8 +117,8 @@ const BIHAR_LOCALITIES = [
 
 export class AIAnalysisService implements IAIAnalysisService {
   /**
-   * Deterministic, explainable, bilingual analysis engine for Bihar Police Hackathon PS-04.
-   * Clearly marked as DEMO_RULE_BASED to maintain transparency.
+   * Genuine, testable 8-stage grievance intelligence pipeline:
+   * INGEST -> NORMALISE -> CLASSIFY -> EXTRACT -> MATCH -> SCORE -> ROUTE -> ALERT
    */
   public analyzeComplaint(
     title: string,
@@ -119,47 +129,84 @@ export class AIAnalysisService implements IAIAnalysisService {
     lng: number,
     existingCases: ExistingCaseSummary[] = []
   ): IAIAnalysisResult {
-    const combinedText = `${title} ${description}`.toLowerCase();
+    const candidates: ExistingIncidentCandidate[] = existingCases.map(c => ({
+      id: c.id,
+      trackingId: c.trackingId,
+      title: c.title,
+      description: c.description,
+      category: c.category,
+      latitude: c.latitude,
+      longitude: c.longitude,
+      district: c.district,
+      locality: c.locality,
+      createdAt: new Date(),
+      incidentClusterId: c.incidentClusterId,
+    }));
 
-    // 1. Classification
-    const { category, confidence } = this.classifyCategory(combinedText);
-
-    // 2. Sentiment & Urgency
-    const { sentiment, sentimentScore, urgencyScore } = this.analyzeSentiment(combinedText);
-
-    // 3. Entity & Keyword Extraction
-    const entities = this.extractEntities(combinedText, district, locality);
-
-    // 4. Duplicate Candidate Detection
-    const duplicateCheck = this.detectDuplicates(
-      combinedText,
-      category,
-      district,
-      locality,
-      lat,
-      lng,
-      existingCases
+    const pipeResult = pipelineOrchestrator.execute(
+      {
+        title,
+        description,
+        complainantName: 'Citizen',
+        complainantPhone: '',
+        latitude: lat,
+        longitude: lng,
+        district,
+        locality,
+        address: `${locality}, ${district}`,
+      },
+      candidates
     );
 
-    // 5. Priority Recommendation
-    const { priority, priorityReason } = this.computePriority(
-      category,
-      urgencyScore,
-      duplicateCheck.isPotentialDuplicate,
-      entities.keywords
-    );
+    // Compute sentiment from hazard & urgency
+    let sentiment: 'Frustrated' | 'Urgent' | 'Neutral' | 'Distressed' = 'Neutral';
+    let sentimentScore = -0.2;
+    if (pipeResult.extract.criticalHazardKeywords.length > 0) {
+      sentiment = 'Distressed';
+      sentimentScore = -0.85;
+    } else if (pipeResult.score.priority === 'CRITICAL' || pipeResult.score.priority === 'HIGH') {
+      sentiment = 'Urgent';
+      sentimentScore = -0.65;
+    } else if (title.includes('no response') || description.includes('days') || description.includes('परेशान')) {
+      sentiment = 'Frustrated';
+      sentimentScore = -0.55;
+    }
+
+    const urgencyScore =
+      pipeResult.score.priority === 'CRITICAL'
+        ? 10
+        : pipeResult.score.priority === 'HIGH'
+        ? 8
+        : Math.min(Math.max(Math.round(pipeResult.score.totalScore / 10), 1), 10);
 
     return {
-      category,
-      categoryConfidence: confidence,
-      priority,
-      priorityReason,
+      category: pipeResult.classify.category,
+      categoryConfidence: pipeResult.classify.confidence,
+      priority: pipeResult.score.priority,
+      priorityReason: pipeResult.score.primaryReason,
       sentiment,
       sentimentScore,
       urgencyScore,
-      entities,
-      duplicateCheck,
-      engineMode: 'DEMO_RULE_BASED',
+      entities: {
+        locations: pipeResult.extract.localities,
+        district: pipeResult.extract.districts[0] || district,
+        landmarks: pipeResult.extract.landmarks,
+        keywords: [...pipeResult.extract.criticalHazardKeywords, ...pipeResult.extract.highUrgencyKeywords],
+      },
+      duplicateCheck: {
+        isPotentialDuplicate: pipeResult.match.isDuplicateCandidate,
+        clusterCandidateId: pipeResult.match.recommendedClusterId,
+        similarityScore: pipeResult.match.topMatch?.compositeScore || 0,
+        matchReason: pipeResult.match.topMatch?.explanation,
+        matchedGrievanceId: pipeResult.match.topMatch?.matchedGrievanceId,
+        matchedTrackingId: pipeResult.match.topMatch?.matchedTrackingId,
+        evidence: pipeResult.match.topMatch,
+      },
+      scoreBreakdown: pipeResult.score,
+      routeRecommendation: pipeResult.route,
+      triggeredAlerts: pipeResult.alert.triggeredAlerts,
+      pipelineTelemetry: pipeResult.telemetry,
+      engineMode: pipeResult.classify.method,
     };
   }
 

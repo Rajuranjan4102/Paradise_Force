@@ -6,6 +6,7 @@ async function main() {
   console.log('🌱 Starting JANRAKSHA AI Synthetic Demo Data Seeding...');
 
   // 1. Clear existing records to ensure clean state
+  await prisma.duplicateCandidate.deleteMany();
   await prisma.caseNote.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.alert.deleteMany();
@@ -861,8 +862,57 @@ async function main() {
     },
   });
 
+  // 7. Seed Duplicate Candidates for Interactive Review (Phase 2)
+  console.log('Seeding candidate duplicate matches for official review...');
+  const g1011 = await prisma.grievance.findUnique({ where: { trackingId: 'JAN-2026-1011' } });
+  const g1012 = await prisma.grievance.findUnique({ where: { trackingId: 'JAN-2026-1012' } });
+  const g1021 = await prisma.grievance.findUnique({ where: { trackingId: 'JAN-2026-1021' } });
+  const g1022 = await prisma.grievance.findUnique({ where: { trackingId: 'JAN-2026-1022' } });
+
+  if (g1011 && g1012) {
+    await prisma.duplicateCandidate.create({
+      data: {
+        sourceGrievanceId: g1012.id,
+        targetGrievanceId: g1011.id,
+        similarityScore: 0.88,
+        evidenceJson: JSON.stringify({
+          textSimilarity: 0.72,
+          categoryAgreement: true,
+          spatialDistanceMeters: 92,
+          spatialScore: 0.85,
+          timeDeltaHours: 1.5,
+          timeScore: 1.0,
+          compositeScore: 0.88,
+          explanation: 'Bilingual match: both report flooded underpass and storm drain choke near Bailey Road Pillar 42 within 92m.',
+        }),
+        status: 'PENDING',
+      },
+    });
+  }
+
+  if (g1021 && g1022) {
+    await prisma.duplicateCandidate.create({
+      data: {
+        sourceGrievanceId: g1022.id,
+        targetGrievanceId: g1021.id,
+        similarityScore: 0.94,
+        evidenceJson: JSON.stringify({
+          textSimilarity: 0.80,
+          categoryAgreement: true,
+          spatialDistanceMeters: 65,
+          spatialScore: 1.0,
+          timeDeltaHours: 2.0,
+          timeScore: 1.0,
+          compositeScore: 0.94,
+          explanation: 'Critical match: concurrent complaints regarding 11kV transformer arcing over vegetable market within 65m.',
+        }),
+        status: 'PENDING',
+      },
+    });
+  }
+
   console.log('✅ JANRAKSHA AI Synthetic Demo Data successfully seeded!');
-  console.log('Summary: 6 Departments, 5 Demo Personas, 3 Incident Clusters, 16 Fictional Grievances, 3 Alerts.');
+  console.log('Summary: 6 Departments, 5 Demo Personas, 3 Incident Clusters, 16 Bilingual Grievances, 3 Alerts, 2 Duplicate Candidates.');
 }
 
 main()

@@ -72,6 +72,7 @@ model AIAnalysis {
   isDuplicateCandidate   Boolean     @default(false)
   duplicateReason        String?
   engineMode             String      @default("DEMO_RULE_BASED") // Clear indicator of demo analyzer
+  pipelineMetaJson       String      @default("{}") // 8-stage pipeline telemetry: INGEST->NORMALISE->CLASSIFY->EXTRACT->MATCH->SCORE->ROUTE->ALERT
   analyzedAt             DateTime    @default(now())
 
   grievance              Grievance   @relation(fields: [grievanceId], references: [id], onDelete: Cascade)
@@ -90,49 +91,74 @@ model IncidentCluster {
   status         String      @default("INVESTIGATING") // INVESTIGATING, DISPATCHED, MITIGATED, RESOLVED
   centerLat      Float
   centerLng      Float
-  radiusMeters   Int         @default(500)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  radiusMeters          Int         @default(500)
+  priorityScore         Float       @default(50.0) // 1 to 100 calculated score
+  priorityBreakdownJson String      @default("{}")
+  recommendedDeptId     String?
+  routingReason         String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 
-  grievances     Grievance[]
+  grievances            Grievance[]
 }
 
 model Grievance {
-  id                String           @id @default(uuid())
-  trackingId        String           @unique // e.g., JAN-2026-1001
-  title             String
-  description       String
-  originalLanguage  String           @default("en") // "en" | "hi"
-  category          String           // ROAD_DAMAGE, WATERLOGGING, GARBAGE_WASTE, WATER_SUPPLY, ELECTRICITY, PUBLIC_SAFETY, HEALTH_SANITATION
-  severity          String           // LOW, MEDIUM, HIGH, CRITICAL
-  status            String           @default("OPEN") // OPEN, ASSIGNED, IN_PROGRESS, VERIFICATION, RESOLVED
+  id                     String      @id @default(uuid())
+  trackingId             String      @unique // e.g., JAN-2026-1001
+  title                  String
+  description            String
+  originalLanguage       String      @default("en") // "en" | "hi"
+  category               String      // ROAD_DAMAGE, WATERLOGGING, GARBAGE_WASTE, WATER_SUPPLY, ELECTRICITY, PUBLIC_SAFETY, HEALTH_SANITATION, INFRASTRUCTURE, OTHER_CIVIC
+  severity               String      // LOW, MEDIUM, HIGH, CRITICAL
+  status                 String      @default("OPEN") // OPEN, ASSIGNED, IN_PROGRESS, VERIFICATION, RESOLVED
   
-  complainantName   String
-  complainantPhone  String
-  isAnonymous       Boolean          @default(false)
+  complainantName        String
+  complainantPhone       String
+  isAnonymous            Boolean     @default(false)
 
-  locationId        String
-  location          Location         @relation(fields: [locationId], references: [id])
+  locationId             String
+  location               Location    @relation(fields: [locationId], references: [id])
 
-  departmentId      String?
-  department        Department?      @relation(fields: [departmentId], references: [id])
+  departmentId           String?
+  department             Department? @relation(fields: [departmentId], references: [id])
 
-  assignedOfficerId String?
-  assignedOfficer   User?            @relation("AssignedOfficer", fields: [assignedOfficerId], references: [id])
+  assignedOfficerId      String?
+  assignedOfficer        User?       @relation("AssignedOfficer", fields: [assignedOfficerId], references: [id])
 
-  incidentClusterId String?
-  incidentCluster   IncidentCluster? @relation(fields: [incidentClusterId], references: [id])
+  incidentClusterId      String?
+  incidentCluster        IncidentCluster? @relation(fields: [incidentClusterId], references: [id])
 
-  aiAnalysis        AIAnalysis?
+  aiAnalysis             AIAnalysis?
 
-  resolutionNote    String?
-  resolvedAt        DateTime?
-  slaDeadline       DateTime
+  resolutionNote         String?
+  resolvedAt             DateTime?
+  slaDeadline            DateTime
 
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
+  priorityOverridden     Boolean     @default(false)
+  priorityOverrideReason String?
+  priorityOverriddenBy   String?
 
-  notes             CaseNote[]
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+
+  notes                  CaseNote[]
+  sourceDuplicates       DuplicateCandidate[] @relation("SourceDuplicates")
+  targetDuplicates       DuplicateCandidate[] @relation("TargetDuplicates")
+}
+
+model DuplicateCandidate {
+  id                String      @id @default(uuid())
+  sourceGrievanceId String
+  targetGrievanceId String
+  sourceGrievance   Grievance   @relation("SourceDuplicates", fields: [sourceGrievanceId], references: [id], onDelete: Cascade)
+  targetGrievance   Grievance   @relation("TargetDuplicates", fields: [targetGrievanceId], references: [id], onDelete: Cascade)
+  similarityScore   Float
+  evidenceJson      String      // Detailed breakdown of text, geo, time, category
+  status            String      @default("PENDING") // PENDING, CONFIRMED, REJECTED
+  reviewedById      String?
+  reviewedAt        DateTime?
+  reviewNotes       String?
+  createdAt         DateTime    @default(now())
 }
 
 model CaseNote {

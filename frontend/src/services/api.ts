@@ -202,6 +202,80 @@ class ApiService {
     if (!data.success) throw new Error(data.message || 'Failed to fetch personas');
     return data.data;
   }
+
+  // Phase 2: Priority Override with Mandatory Reason
+  async overridePriority(id: string, priority: string, reason: string): Promise<GrievanceModel> {
+    const res = await fetch(`${API_BASE}/grievances/${id}/priority-override`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ priority, reason }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to override priority');
+    return data.data;
+  }
+
+  // Phase 2: Duplicate Candidates Review Queue
+  async fetchDuplicateCandidates(status?: string): Promise<any[]> {
+    const url = status && status !== 'ALL' ? `${API_BASE}/duplicates?status=${status}` : `${API_BASE}/duplicates`;
+    const res = await fetch(url, { headers: this.getHeaders() });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to fetch duplicate candidates');
+    return data.data;
+  }
+
+  async confirmDuplicate(id: string, clusterTitle?: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/duplicates/${id}/confirm`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ clusterTitle }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to confirm duplicate candidate');
+    return data.data;
+  }
+
+  async rejectDuplicate(id: string, notes?: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/duplicates/${id}/reject`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ notes }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to reject duplicate candidate');
+    return data.data;
+  }
+
+  // Phase 2: Cluster Case Merging & Removal
+  async mergeCasesIntoCluster(clusterId: string, grievanceIds: string[]): Promise<IncidentClusterModel> {
+    const res = await fetch(`${API_BASE}/clusters/${clusterId}/merge`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ grievanceIds }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to merge cases into cluster');
+    return data.data;
+  }
+
+  async removeCaseFromCluster(grievanceId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/clusters/cases/${grievanceId}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to remove case from cluster');
+    return data.data;
+  }
+
+  // Phase 2: Department Recommendation
+  async fetchDepartmentRecommendation(category: string, district?: string): Promise<any> {
+    const url = `${API_BASE}/departments/recommend?category=${encodeURIComponent(category)}&district=${encodeURIComponent(district || 'Patna Central')}`;
+    const res = await fetch(url, { headers: this.getHeaders() });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to fetch recommendation');
+    return data.data;
+  }
 }
 
 export const api = new ApiService();

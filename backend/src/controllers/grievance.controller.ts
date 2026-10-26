@@ -95,6 +95,58 @@ export class GrievanceController {
       next(error);
     }
   }
+
+  async overridePriority(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { priority, reason } = req.body;
+      if (!req.user) {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+      const updated = await grievanceService.overridePriority(id, priority, reason, req.user);
+      res.json({ success: true, data: updated });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async listDuplicates(req: Request, res: Response, next: NextFunction) {
+    try {
+      const status = req.query.status as string | undefined;
+      const candidates = await grievanceService.listDuplicateCandidates(status);
+      res.json({ success: true, data: candidates });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async confirmDuplicate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { clusterTitle } = req.body;
+      if (!req.user) {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+      const confirmed = await grievanceService.confirmDuplicateCandidate(id, req.user, clusterTitle);
+      res.json({ success: true, data: confirmed });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async rejectDuplicate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { notes } = req.body;
+      if (!req.user) {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+      const rejected = await grievanceService.rejectDuplicateCandidate(id, notes, req.user);
+      res.json({ success: true, data: rejected });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const grievanceController = new GrievanceController();

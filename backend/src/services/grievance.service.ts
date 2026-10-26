@@ -134,6 +134,20 @@ export class GrievanceService {
         notes: {
           orderBy: { createdAt: 'desc' },
         },
+        sourceDuplicates: {
+          include: {
+            targetGrievance: {
+              select: { id: true, trackingId: true, title: true, severity: true, status: true, location: true },
+            },
+          },
+        },
+        targetDuplicates: {
+          include: {
+            sourceGrievance: {
+              select: { id: true, trackingId: true, title: true, severity: true, status: true, location: true },
+            },
+          },
+        },
       },
     });
 
@@ -263,7 +277,7 @@ export class GrievanceService {
       },
     });
 
-    // 8. Store AI Analysis record
+    // 8. Store AI Analysis record with 8-stage pipeline telemetry
     await prisma.aIAnalysis.create({
       data: {
         grievanceId: grievance.id,
@@ -279,10 +293,28 @@ export class GrievanceService {
         isDuplicateCandidate: aiResult.duplicateCheck.isPotentialDuplicate,
         duplicateReason: aiResult.duplicateCheck.matchReason || null,
         engineMode: aiResult.engineMode,
+        pipelineMetaJson: JSON.stringify({
+          telemetry: aiResult.pipelineTelemetry || [],
+          scoreBreakdown: aiResult.scoreBreakdown || null,
+          routeRecommendation: aiResult.routeRecommendation || null,
+        }),
       },
     });
 
-    // 8. Log Audit Record
+    // 9. If duplicate match candidate detected, record auditable candidate relationship
+    if (aiResult.duplicateCheck.isPotentialDuplicate && aiResult.duplicateCheck.matchedGrievanceId) {
+      await prisma.duplicateCandidate.create({
+        data: {
+          sourceGrievanceId: grievance.id,
+          targetGrievanceId: aiResult.duplicateCheck.matchedGrievanceId,
+          similarityScore: aiResult.duplicateCheck.similarityScore,
+          evidenceJson: JSON.stringify(aiResult.duplicateCheck.evidence || { reason: aiResult.duplicateCheck.matchReason }),
+          status: 'PENDING',
+        },
+      });
+    }
+
+    // 10. Log Audit Record
     await auditService.record({
       action: 'GRIEVANCE_CREATED',
       actorId: user?.id || 'citizen-portal',
@@ -295,11 +327,30 @@ export class GrievanceService {
         category,
         severity,
         district: input.district,
+        engineMode: aiResult.engineMode,
       },
     });
 
-    // 9. If Critical, spawn an Alert
-    if (severity === 'CRITICAL') {
+    // 11. Spawn alerts from pipeline alert stage or critical severity
+    if (aiResult.triggeredAlerts && aiResult.triggeredAlerts.length > 0) {
+      for (const tAlert of aiResult.triggeredAlerts) {
+        await prisma.alert.create({
+          data: {
+            title: tAlert.title,
+            message: tAlert.message,
+            severity: tAlert.severity,
+            type: tAlert.type,
+            district: tAlert.district,
+            metadata: JSON.stringify({
+              grievanceId: grievance.id,
+              trackingId,
+              trigger: tAlert.trigger,
+              supportingCaseIds: tAlert.supportingCaseIds,
+            }),
+          },
+        });
+      }
+    } else if (severity === 'CRITICAL') {
       await prisma.alert.create({
         data: {
           title: `CRITICAL ALERT: ${input.title}`,
@@ -307,7 +358,7 @@ export class GrievanceService {
           severity: 'CRITICAL',
           type: 'SEVERITY_SURGE',
           district: input.district,
-          metadata: JSON.stringify({ grievanceId: grievance.id, trackingId }),
+          metadata: JSON.stringify({ grievanceId: grievance.id, trackingId, trigger: 'CRITICAL_SEVERITY_INGEST' }),
         },
       });
     }
@@ -476,6 +527,187 @@ export class GrievanceService {
     });
 
     return note;
+  }
+
+  /**
+   * Phase 2: Official priority review & override with mandatory documented justification
+   */
+  async overridePriority(id: string, newPriority: string, reason: string, user: AuthUser) {
+    if (!reason || reason.trim().length < 5) {
+      throw new Error('A detailed reason is required for an official priority override');
+    }
+
+    const existing = await prisma.grievance.findUnique({ where: { id } });
+    if (!existing) throw new Error(`Grievance ${id} not found`);
+
+    const updated = await prisma.grievance.update({
+      where: { id },
+      data: {
+        severity: newPriority,
+        priorityOverridden: true,
+        priorityOverrideReason: reason,
+        priorityOverriddenBy: `${user.name} (${user.role})`,
+      },
+    });
+
+    // Record internal case note
+    await prisma.caseNote.create({
+      data: {
+        grievanceId: id,
+        authorId: user.id,
+        authorName: user.name,
+        authorRole: user.role,
+        noteText: `PRIORITY OVERRIDE: Changed from ${existing.severity} to ${newPriority}. Justification: ${reason}`,
+        isInternal: true,
+      },
+    });
+
+    // Immutable audit record
+    await auditService.record({
+      action: 'PRIORITY_OVERRIDDEN',
+      actorId: user.id,
+      actorName: user.name,
+      actorRole: user.role,
+      entityType: 'GRIEVANCE',
+      entityId: id,
+      oldValues: { severity: existing.severity },
+      newValues: { severity: newPriority, reason, overriddenBy: user.name },
+    });
+
+    return this.getGrievanceById(id);
+  }
+
+  /**
+   * Phase 2: Duplicate candidate detection review & management
+   */
+  async listDuplicateCandidates(status?: string) {
+    return prisma.duplicateCandidate.findMany({
+      where: status && status !== 'ALL' ? { status } : {},
+      include: {
+        sourceGrievance: {
+          include: { location: true },
+        },
+        targetGrievance: {
+          include: { location: true },
+        },
+      },
+      orderBy: { similarityScore: 'desc' },
+      take: 50,
+    });
+  }
+
+  async confirmDuplicateCandidate(candidateId: string, user: AuthUser, clusterTitle?: string) {
+    const candidate = await prisma.duplicateCandidate.findUnique({
+      where: { id: candidateId },
+      include: {
+        sourceGrievance: { include: { location: true } },
+        targetGrievance: { include: { location: true } },
+      },
+    });
+
+    if (!candidate) throw new Error('Duplicate candidate not found');
+
+    // 1. Determine or create cluster
+    let clusterId =
+      candidate.sourceGrievance.incidentClusterId ||
+      candidate.targetGrievance.incidentClusterId;
+
+    if (!clusterId) {
+      // Create new incident cluster from these twin cases
+      const newCluster = await prisma.incidentCluster.create({
+        data: {
+          clusterCode: `CLUST-${candidate.sourceGrievance.location.district.replace(/\s+/g, '').toUpperCase().slice(0, 5)}-${Math.floor(100 + Math.random() * 900)}`,
+          title: clusterTitle || `Incident Cluster: ${candidate.sourceGrievance.title.slice(0, 60)}`,
+          description: `Grouped reports for verified incident at ${candidate.sourceGrievance.location.locality}`,
+          category: candidate.sourceGrievance.category,
+          district: candidate.sourceGrievance.location.district,
+          locality: candidate.sourceGrievance.location.locality,
+          rootCause: `Multi-complainant civic disruption: confirmed correlation between ${candidate.sourceGrievance.trackingId} and ${candidate.targetGrievance.trackingId}`,
+          severity: candidate.sourceGrievance.severity === 'CRITICAL' || candidate.targetGrievance.severity === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
+          status: 'INVESTIGATING',
+          centerLat: candidate.sourceGrievance.location.latitude,
+          centerLng: candidate.sourceGrievance.location.longitude,
+          radiusMeters: 400,
+        },
+      });
+      clusterId = newCluster.id;
+    }
+
+    // 2. Link both grievances to cluster without deleting any reports
+    await Promise.all([
+      prisma.grievance.update({
+        where: { id: candidate.sourceGrievanceId },
+        data: { incidentClusterId: clusterId },
+      }),
+      prisma.grievance.update({
+        where: { id: candidate.targetGrievanceId },
+        data: { incidentClusterId: clusterId },
+      }),
+    ]);
+
+    // 3. Mark candidate as CONFIRMED
+    const updatedCandidate = await prisma.duplicateCandidate.update({
+      where: { id: candidateId },
+      data: {
+        status: 'CONFIRMED',
+        reviewedById: user.id,
+        reviewedAt: new Date(),
+        reviewNotes: `Confirmed by ${user.name} (${user.role}). Associated with Cluster ID ${clusterId}.`,
+      },
+    });
+
+    // 4. Audit Log
+    await auditService.record({
+      action: 'DUPLICATE_CONFIRMED_MERGED',
+      actorId: user.id,
+      actorName: user.name,
+      actorRole: user.role,
+      entityType: 'DUPLICATE_CANDIDATE',
+      entityId: candidateId,
+      newValues: {
+        clusterId,
+        sourceTrackingId: candidate.sourceGrievance.trackingId,
+        targetTrackingId: candidate.targetGrievance.trackingId,
+        similarityScore: candidate.similarityScore,
+      },
+    });
+
+    return updatedCandidate;
+  }
+
+  async rejectDuplicateCandidate(candidateId: string, notes: string, user: AuthUser) {
+    const candidate = await prisma.duplicateCandidate.findUnique({
+      where: { id: candidateId },
+      include: { sourceGrievance: true, targetGrievance: true },
+    });
+
+    if (!candidate) throw new Error('Duplicate candidate not found');
+
+    const updated = await prisma.duplicateCandidate.update({
+      where: { id: candidateId },
+      data: {
+        status: 'REJECTED',
+        reviewedById: user.id,
+        reviewedAt: new Date(),
+        reviewNotes: notes || `Rejected by ${user.name}: records represent distinct incidents.`,
+      },
+    });
+
+    await auditService.record({
+      action: 'DUPLICATE_REJECTED',
+      actorId: user.id,
+      actorName: user.name,
+      actorRole: user.role,
+      entityType: 'DUPLICATE_CANDIDATE',
+      entityId: candidateId,
+      newValues: {
+        sourceTrackingId: candidate.sourceGrievance.trackingId,
+        targetTrackingId: candidate.targetGrievance.trackingId,
+        notes,
+      },
+    });
+
+    return updated;
   }
 }
 

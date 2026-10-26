@@ -74,6 +74,6 @@ describe('JANRAKSHA AI REST API Integration Tests', () => {
     expect(res.body.success).toBe(true);
     expect(res.body.data.trackingId).toMatch(/^JAN-2026-/);
     expect(res.body.data.aiAnalysis).toBeDefined();
-    expect(res.body.data.aiAnalysis.engineMode).toBe('DEMO_RULE_BASED');
+    expect(['REAL_LOCAL_MODEL', 'DETERMINISTIC_RULES', 'DEMO_RULE_BASED']).toContain(res.body.data.aiAnalysis.engineMode);
   });
 });

@@ -48,6 +48,7 @@ export interface AIAnalysisModel {
   isDuplicateCandidate: boolean;
   duplicateReason?: string | null;
   engineMode: string;
+  pipelineMetaJson?: string;
   analyzedAt: string;
 }
 
@@ -104,12 +105,31 @@ export interface IncidentClusterModel {
   centerLat: number;
   centerLng: number;
   radiusMeters: number;
+  priorityScore?: number;
+  priorityBreakdownJson?: string;
+  recommendedDeptId?: string | null;
+  routingReason?: string | null;
   createdAt: string;
   updatedAt: string;
   grievances?: GrievanceModel[];
   _count?: {
     grievances: number;
   };
+}
+
+export interface DuplicateCandidateModel {
+  id: string;
+  sourceGrievanceId: string;
+  targetGrievanceId: string;
+  sourceGrievance?: GrievanceModel;
+  targetGrievance?: GrievanceModel;
+  similarityScore: number;
+  evidenceJson: string;
+  status: 'PENDING' | 'CONFIRMED' | 'REJECTED';
+  reviewedById?: string | null;
+  reviewedAt?: string | null;
+  reviewNotes?: string | null;
+  createdAt: string;
 }
 
 export interface GrievanceModel {
@@ -136,10 +156,15 @@ export interface GrievanceModel {
   resolutionNote?: string | null;
   resolvedAt?: string | null;
   slaDeadline: string;
+  priorityOverridden?: boolean;
+  priorityOverrideReason?: string | null;
+  priorityOverriddenBy?: string | null;
   createdAt: string;
   updatedAt: string;
   notes?: CaseNoteModel[];
   auditLogs?: AuditLogModel[];
+  sourceDuplicates?: DuplicateCandidateModel[];
+  targetDuplicates?: DuplicateCandidateModel[];
 }
 
 export interface AuditLogModel {

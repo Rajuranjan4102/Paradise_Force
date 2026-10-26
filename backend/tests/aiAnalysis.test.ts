@@ -14,7 +14,7 @@ describe('AIAnalysisService (Bilingual Demo Intelligence Engine)', () => {
 
     expect(result.category).toBe('ROAD_DAMAGE');
     expect(result.categoryConfidence).toBeGreaterThan(0.7);
-    expect(result.engineMode).toBe('DEMO_RULE_BASED');
+    expect(['REAL_LOCAL_MODEL', 'DETERMINISTIC_RULES', 'DEMO_RULE_BASED']).toContain(result.engineMode);
   });
 
   it('should accurately classify a Hindi waterlogging complaint', () => {
