@@ -1,0 +1,175 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  name          String
+  role          String       // SUPER_ADMIN, DISTRICT_MAGISTRATE, DEPARTMENT_OFFICER, FIELD_INVESTIGATOR
+  departmentId  String?
+  department    Department?  @relation(fields: [departmentId], references: [id])
+  district      String?      // e.g., "Patna Central", "Gaya City"
+  badgeNumber   String?
+  phone         String?
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  assignedCases Grievance[]  @relation("AssignedOfficer")
+  notes         CaseNote[]
+}
+
+model Department {
+  id           String      @id @default(uuid())
+  code         String      @unique // PWD, WSS, ELEC, SWM, POLICE, DRAINAGE
+  name         String
+  description  String
+  slaHours     Int         @default(48)
+  headOfficer  String
+  contactEmail String
+  contactPhone String?
+  colorHex     String      @default("#06B6D4")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  officers     User[]
+  grievances   Grievance[]
+}
+
+model Location {
+  id           String      @id @default(uuid())
+  latitude     Float
+  longitude    Float
+  address      String
+  locality     String      // e.g. "Bailey Road", "Kankarbagh"
+  landmark     String?
+  district     String      // e.g. "Patna Central"
+  pincode      String?
+  confidence   Float       @default(0.95) // 0.0 to 1.0 confidence in location accuracy
+  createdAt    DateTime    @default(now())
+
+  grievances   Grievance[]
+}
+
+model AIAnalysis {
+  id                     String      @id @default(uuid())
+  grievanceId            String      @unique
+  category               String
+  categoryConfidence     Float       @default(0.90)
+  priority               String      // LOW, MEDIUM, HIGH, CRITICAL
+  priorityReason         String
+  sentiment              String      // Frustrated, Urgent, Neutral, Distressed
+  sentimentScore         Float       @default(0.0) // -1.0 to 1.0
+  urgencyScore           Int         @default(5)   // 1 to 10
+  entitiesJson           String      @default("{}") // Extracted locations, keywords, landmarks
+  duplicateScore         Float       @default(0.0)
+  isDuplicateCandidate   Boolean     @default(false)
+  duplicateReason        String?
+  engineMode             String      @default("DEMO_RULE_BASED") // Clear indicator of demo analyzer
+  analyzedAt             DateTime    @default(now())
+
+  grievance              Grievance   @relation(fields: [grievanceId], references: [id], onDelete: Cascade)
+}
+
+model IncidentCluster {
+  id             String      @id @default(uuid())
+  clusterCode    String      @unique // e.g. CLUST-PATNA-001
+  title          String
+  description    String
+  category       String
+  district       String
+  locality       String
+  rootCause      String
+  severity       String      // LOW, MEDIUM, HIGH, CRITICAL
+  status         String      @default("INVESTIGATING") // INVESTIGATING, DISPATCHED, MITIGATED, RESOLVED
+  centerLat      Float
+  centerLng      Float
+  radiusMeters   Int         @default(500)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  grievances     Grievance[]
+}
+
+model Grievance {
+  id                String           @id @default(uuid())
+  trackingId        String           @unique // e.g., JAN-2026-1001
+  title             String
+  description       String
+  originalLanguage  String           @default("en") // "en" | "hi"
+  category          String           // ROAD_DAMAGE, WATERLOGGING, GARBAGE_WASTE, WATER_SUPPLY, ELECTRICITY, PUBLIC_SAFETY, HEALTH_SANITATION
+  severity          String           // LOW, MEDIUM, HIGH, CRITICAL
+  status            String           @default("OPEN") // OPEN, ASSIGNED, IN_PROGRESS, VERIFICATION, RESOLVED
+  
+  complainantName   String
+  complainantPhone  String
+  isAnonymous       Boolean          @default(false)
+
+  locationId        String
+  location          Location         @relation(fields: [locationId], references: [id])
+
+  departmentId      String?
+  department        Department?      @relation(fields: [departmentId], references: [id])
+
+  assignedOfficerId String?
+  assignedOfficer   User?            @relation("AssignedOfficer", fields: [assignedOfficerId], references: [id])
+
+  incidentClusterId String?
+  incidentCluster   IncidentCluster? @relation(fields: [incidentClusterId], references: [id])
+
+  aiAnalysis        AIAnalysis?
+
+  resolutionNote    String?
+  resolvedAt        DateTime?
+  slaDeadline       DateTime
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  notes             CaseNote[]
+}
+
+model CaseNote {
+  id           String      @id @default(uuid())
+  grievanceId  String
+  grievance    Grievance   @relation(fields: [grievanceId], references: [id], onDelete: Cascade)
+  authorId     String
+  author       User        @relation(fields: [authorId], references: [id])
+  authorName   String
+  authorRole   String
+  noteText     String
+  isInternal   Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  action     String      // GRIEVANCE_CREATED, STATUS_UPDATED, REASSIGNED, RESOLVED, NOTE_ADDED
+  actorId    String
+  actorName  String
+  actorRole  String
+  entityType String      // GRIEVANCE, DEPARTMENT, CLUSTER, USER
+  entityId   String
+  oldValues  String?     // JSON serialized previous state
+  newValues  String?     // JSON serialized new state
+  ipAddress  String?     @default("127.0.0.1")
+  timestamp  DateTime    @default(now())
+}
+
+model Alert {
+  id         String      @id @default(uuid())
+  title      String
+  message    String
+  severity   String      // INFO, WARNING, CRITICAL
+  type       String      // SLA_BREACH, SEVERITY_SURGE, ANOMALY_CLUSTER, PUBLIC_SAFETY
+  district   String?
+  isRead     Boolean     @default(false)
+  metadata   String?     // JSON serialized extra context
+  createdAt  DateTime    @default(now())
+}
