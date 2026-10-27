@@ -29,6 +29,9 @@ export interface IAIAnalysisResult {
   triggeredAlerts?: any[];
   pipelineTelemetry?: any[];
   engineMode: string;
+  modelProvider?: string;
+  modelVersion?: string;
+  languageDetected?: string;
 }
 
 export interface ExistingCaseSummary {
@@ -207,6 +210,9 @@ export class AIAnalysisService implements IAIAnalysisService {
       triggeredAlerts: pipeResult.alert.triggeredAlerts,
       pipelineTelemetry: pipeResult.telemetry,
       engineMode: pipeResult.classify.method,
+      modelProvider: pipeResult.classify.algorithm || 'LOCAL_TFIDF_RULES',
+      modelVersion: 'v3.2-bilingual',
+      languageDetected: pipeResult.normalise.detectedLanguage || 'en',
     };
   }
 

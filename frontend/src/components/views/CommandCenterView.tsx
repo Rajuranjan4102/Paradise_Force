@@ -386,7 +386,7 @@ export const CommandCenterView: React.FC = () => {
                 >
                   <td className="py-3 font-mono font-bold text-cyan-400">{caseItem.trackingId}</td>
                   <td className="py-3 max-w-xs font-medium text-slate-200 truncate pr-3">{caseItem.title}</td>
-                  <td className="py-3 text-slate-300 pr-3">{caseItem.location.locality}</td>
+                  <td className="py-3 text-slate-300 pr-3">{caseItem.location?.locality || 'Not specified'}</td>
                   <td className="py-3 pr-3">
                     <CategoryBadge category={caseItem.category} />
                   </td>

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { grievanceService } from '../services/grievance.service';
+import { visionModelAdapter } from '../services/ai/visionModelAdapter';
 import {
   CreateGrievanceSchema,
   GrievanceFilterSchema,
@@ -7,6 +8,7 @@ import {
   AssignCaseSchema,
   ResolveCaseSchema,
   AddNoteSchema,
+  VerifyMediaSchema,
 } from '../schemas/grievance.schema';
 
 export class GrievanceController {
@@ -23,7 +25,7 @@ export class GrievanceController {
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const grievance = await grievanceService.getGrievanceById(id);
+      const grievance = await grievanceService.getGrievanceById(id, req.user);
       res.json({ success: true, data: grievance });
     } catch (error) {
       next(error);
@@ -32,9 +34,45 @@ export class GrievanceController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const input = CreateGrievanceSchema.parse(req.body);
+      // Parse body (supports multipart form data strings or JSON)
+      const body = { ...req.body };
+      if (typeof body.latitude === 'string') body.latitude = parseFloat(body.latitude);
+      if (typeof body.longitude === 'string') body.longitude = parseFloat(body.longitude);
+      if (typeof body.isAnonymous === 'string') body.isAnonymous = body.isAnonymous === 'true';
+
+      const input = CreateGrievanceSchema.parse(body);
+
+      // Multimodal processing if photo or video was uploaded
+      if (req.file) {
+        const visionResult = await visionModelAdapter.analyzeMedia(
+          req.file.path,
+          req.file.mimetype,
+          req.file.originalname
+        );
+        input.mediaUrl = `/uploads/${req.file.filename}`;
+        input.mediaType = req.file.mimetype.startsWith('video/') ? 'VIDEO' : 'IMAGE';
+        input.mediaAnalysisJson = JSON.stringify(visionResult);
+        if (!input.category && visionResult.recommendedCategory) {
+          input.category = visionResult.recommendedCategory as any;
+        }
+      }
+
       const grievance = await grievanceService.createGrievance(input, req.user);
       res.status(201).json({ success: true, data: grievance });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async verifyMedia(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { verified, note } = VerifyMediaSchema.parse(req.body);
+      if (!req.user) {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+      const updated = await grievanceService.verifyMedia(id, verified, note, req.user);
+      res.json({ success: true, data: updated });
     } catch (error) {
       next(error);
     }

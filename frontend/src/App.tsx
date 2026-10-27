@@ -11,6 +11,8 @@ import { AlertsTrendsView } from './components/views/AlertsTrendsView';
 import { AdministrationSettingsView } from './components/views/AdministrationSettingsView';
 import { CaseDetailDrawer } from './components/grievance/CaseDetailDrawer';
 import { CreateGrievanceModal } from './components/grievance/CreateGrievanceModal';
+import { GuidedDemoModal } from './components/demo/GuidedDemoModal';
+import { SystemStatusModal } from './components/system/SystemStatusModal';
 
 const MainLayout: React.FC = () => {
   const { activeScreen } = useApp();
@@ -54,6 +56,12 @@ const MainLayout: React.FC = () => {
 
       {/* Ingest Grievance Modal */}
       <CreateGrievanceModal />
+
+      {/* Phase 4: Guided Judge Demo Modal */}
+      <GuidedDemoModal />
+
+      {/* Phase 4: System Health & Status Diagnostics Modal */}
+      <SystemStatusModal />
     </div>
   );
 };

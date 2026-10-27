@@ -1,6 +1,8 @@
 import { prisma } from '../lib/prisma';
 import { aiAnalysisService, ExistingCaseSummary } from './aiAnalysis.service';
 import { auditService } from './audit.service';
+import { geocodingService } from './geospatial/geocodingService';
+import { privacyService } from './privacy/privacyService';
 import {
   CreateGrievanceInput,
   GrievanceFilterQuery,
@@ -89,8 +91,10 @@ export class GrievanceService {
       }),
     ]);
 
+    const sanitizedItems = items.map(item => privacyService.sanitizeGrievanceForDisplay(item, user?.role));
+
     return {
-      items,
+      items: sanitizedItems,
       pagination: {
         total,
         page,
@@ -100,7 +104,7 @@ export class GrievanceService {
     };
   }
 
-  async getGrievanceById(id: string) {
+  async getGrievanceById(id: string, user?: AuthUser) {
     const grievance = await prisma.grievance.findUnique({
       where: { id },
       include: {
@@ -165,7 +169,8 @@ export class GrievanceService {
       take: 20,
     });
 
-    return { ...grievance, auditLogs };
+    const sanitized = privacyService.sanitizeGrievanceForDisplay(grievance, user?.role);
+    return { ...sanitized, auditLogs };
   }
 
   async createGrievance(input: CreateGrievanceInput, user?: AuthUser) {
@@ -188,28 +193,42 @@ export class GrievanceService {
       title: c.title,
       description: c.description,
       category: c.category,
-      district: c.location.district,
-      locality: c.location.locality,
-      latitude: c.location.latitude,
-      longitude: c.location.longitude,
+      district: c.location?.district || 'Patna Central',
+      locality: c.location?.locality || 'Urban Ward',
+      latitude: c.location?.latitude || 25.5941,
+      longitude: c.location?.longitude || 85.1376,
       incidentClusterId: c.incidentClusterId,
     }));
 
-    // 2. Run Modular AI Analysis
+    // 2. Resolve Geospatial Coordinates with Provenance
+    const geoResult = geocodingService.resolveLocation(
+      `${input.title} ${input.description}`,
+      input.district,
+      input.locality,
+      input.latitude ?? undefined,
+      input.longitude ?? undefined
+    );
+
+    // 3. Privacy Redaction
+    const { redactedText } = privacyService.redactPII(input.description);
+
+    // 4. Run Modular AI Analysis
+    const resolvedLat = geoResult.latitude ?? 25.5941;
+    const resolvedLng = geoResult.longitude ?? 85.1376;
     const aiResult = aiAnalysisService.analyzeComplaint(
       input.title,
       input.description,
-      input.district,
-      input.locality,
-      input.latitude,
-      input.longitude,
+      geoResult.district || input.district || 'Patna Central',
+      geoResult.locality || input.locality || 'Urban Ward',
+      resolvedLat,
+      resolvedLng,
       caseSummaries
     );
 
     const category = input.category || aiResult.category;
     const severity = input.severity || aiResult.priority;
 
-    // 3. Find default department for category if not specified
+    // 5. Find default department for category if not specified
     let departmentId = input.departmentId;
     if (!departmentId) {
       const categoryDeptMap: Record<string, string> = {
@@ -228,11 +247,11 @@ export class GrievanceService {
       }
     }
 
-    // 4. Calculate SLA deadline based on severity
+    // 6. Calculate SLA deadline based on severity
     const hours = severity === 'CRITICAL' ? 12 : severity === 'HIGH' ? 24 : severity === 'MEDIUM' ? 48 : 72;
     const slaDeadline = new Date(Date.now() + hours * 60 * 60 * 1000);
 
-    // 5. Verify cluster ID exists if detected
+    // 7. Verify cluster ID exists if detected
     let assignedClusterId: string | null = null;
     if (aiResult.duplicateCheck.clusterCandidateId) {
       const clusterExists = await prisma.incidentCluster.findUnique({
@@ -243,21 +262,25 @@ export class GrievanceService {
       }
     }
 
-    // 6. Create Location
-    const location = await prisma.location.create({
-      data: {
-        latitude: input.latitude,
-        longitude: input.longitude,
-        address: input.address,
-        locality: input.locality,
-        landmark: input.landmark || null,
-        district: input.district,
-        pincode: input.pincode || null,
-        confidence: 0.95,
-      },
-    });
+    // 8. Create Location (only if resolved coordinates exist)
+    let locationId: string | null = null;
+    if (geoResult.latitude !== null && geoResult.longitude !== null) {
+      const location = await prisma.location.create({
+        data: {
+          latitude: geoResult.latitude,
+          longitude: geoResult.longitude,
+          address: input.address || `${geoResult.locality}, ${geoResult.district}`,
+          locality: geoResult.locality || input.locality || 'Unknown',
+          landmark: input.landmark || null,
+          district: geoResult.district || input.district || 'Patna Central',
+          pincode: input.pincode || null,
+          confidence: geoResult.confidence,
+        },
+      });
+      locationId = location.id;
+    }
 
-    // 7. Create Grievance
+    // 9. Create Grievance
     const grievance = await prisma.grievance.create({
       data: {
         trackingId,
@@ -270,14 +293,23 @@ export class GrievanceService {
         complainantName: input.complainantName,
         complainantPhone: input.complainantPhone,
         isAnonymous: input.isAnonymous || false,
-        locationId: location.id,
+        locationId,
+        locationProvenance: input.locationProvenance || geoResult.provenance,
+        locationConfidence: input.locationConfidence || geoResult.confidence,
         departmentId: departmentId || null,
         incidentClusterId: assignedClusterId,
         slaDeadline,
+        mediaUrl: input.mediaUrl || null,
+        mediaType: input.mediaType || 'NONE',
+        mediaAnalysisJson: input.mediaAnalysisJson || null,
+        sourcePlatform: input.sourcePlatform || 'CITIZEN_PORTAL',
+        sourceReference: input.sourceReference || null,
+        sourceAuthorHandle: input.sourceAuthorHandle || null,
+        redactedDescription: redactedText,
       },
     });
 
-    // 8. Store AI Analysis record with 8-stage pipeline telemetry
+    // 10. Store AI Analysis record with 8-stage pipeline telemetry
     await prisma.aIAnalysis.create({
       data: {
         grievanceId: grievance.id,
@@ -293,6 +325,10 @@ export class GrievanceService {
         isDuplicateCandidate: aiResult.duplicateCheck.isPotentialDuplicate,
         duplicateReason: aiResult.duplicateCheck.matchReason || null,
         engineMode: aiResult.engineMode,
+        modelProvider: aiResult.modelProvider || 'LOCAL_TFIDF_RULES',
+        modelVersion: aiResult.modelVersion || 'v3.2-bilingual',
+        languageDetected: aiResult.languageDetected || 'en',
+        sentimentLabel: aiResult.sentiment || 'Neutral',
         pipelineMetaJson: JSON.stringify({
           telemetry: aiResult.pipelineTelemetry || [],
           scoreBreakdown: aiResult.scoreBreakdown || null,
@@ -614,19 +650,22 @@ export class GrievanceService {
 
     if (!clusterId) {
       // Create new incident cluster from these twin cases
+      const loc = candidate.sourceGrievance.location;
+      const districtName = loc?.district || 'Patna Central';
+      const localityName = loc?.locality || 'Urban Ward';
       const newCluster = await prisma.incidentCluster.create({
         data: {
-          clusterCode: `CLUST-${candidate.sourceGrievance.location.district.replace(/\s+/g, '').toUpperCase().slice(0, 5)}-${Math.floor(100 + Math.random() * 900)}`,
+          clusterCode: `CLUST-${districtName.replace(/\s+/g, '').toUpperCase().slice(0, 5)}-${Math.floor(100 + Math.random() * 900)}`,
           title: clusterTitle || `Incident Cluster: ${candidate.sourceGrievance.title.slice(0, 60)}`,
-          description: `Grouped reports for verified incident at ${candidate.sourceGrievance.location.locality}`,
+          description: `Grouped reports for verified incident at ${localityName}`,
           category: candidate.sourceGrievance.category,
-          district: candidate.sourceGrievance.location.district,
-          locality: candidate.sourceGrievance.location.locality,
+          district: districtName,
+          locality: localityName,
           rootCause: `Multi-complainant civic disruption: confirmed correlation between ${candidate.sourceGrievance.trackingId} and ${candidate.targetGrievance.trackingId}`,
           severity: candidate.sourceGrievance.severity === 'CRITICAL' || candidate.targetGrievance.severity === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
           status: 'INVESTIGATING',
-          centerLat: candidate.sourceGrievance.location.latitude,
-          centerLng: candidate.sourceGrievance.location.longitude,
+          centerLat: loc?.latitude ?? 25.5941,
+          centerLng: loc?.longitude ?? 85.1376,
           radiusMeters: 400,
         },
       });
@@ -704,6 +743,39 @@ export class GrievanceService {
         sourceTrackingId: candidate.sourceGrievance.trackingId,
         targetTrackingId: candidate.targetGrievance.trackingId,
         notes,
+      },
+    });
+
+    return updated;
+  }
+
+  async verifyMedia(id: string, verified: boolean, note?: string, user?: AuthUser) {
+    const grievance = await prisma.grievance.findUnique({ where: { id } });
+    if (!grievance) {
+      throw new Error(`Grievance with ID ${id} not found`);
+    }
+
+    const updated = await prisma.grievance.update({
+      where: { id },
+      data: {
+        mediaVerified: verified,
+        mediaVerifiedBy: user?.name || 'Authorized Officer',
+        mediaVerifiedAt: new Date(),
+        mediaVerificationNote: note || null,
+      },
+    });
+
+    await auditService.record({
+      action: 'MEDIA_VERIFIED',
+      actorId: user?.id || 'officer',
+      actorName: user?.name || 'Authorized Officer',
+      actorRole: user?.role || 'DEPARTMENT_OFFICER',
+      entityType: 'MEDIA',
+      entityId: id,
+      newValues: {
+        mediaVerified: verified,
+        mediaVerifiedBy: user?.name || 'Authorized Officer',
+        mediaVerificationNote: note,
       },
     });
 

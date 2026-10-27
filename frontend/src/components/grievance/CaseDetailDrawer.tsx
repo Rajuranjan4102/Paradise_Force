@@ -26,6 +26,12 @@ import {
   ShieldAlert,
   HelpCircle,
   Radio,
+  Camera,
+  Video,
+  CheckCircle2,
+  AlertCircle,
+  Eye,
+  Globe,
 } from 'lucide-react';
 import { StatusBadge, SeverityBadge, CategoryBadge } from '../common/StatusBadge';
 import { api } from '../../services/api';
@@ -63,6 +69,11 @@ export const CaseDetailDrawer: React.FC = () => {
   const [overrideReason, setOverrideReason] = useState<string>('');
   const [isOverriding, setIsOverriding] = useState<boolean>(false);
 
+  // Phase 3: Multimodal Verification State
+  const [isVerifyingMedia, setIsVerifyingMedia] = useState<boolean>(false);
+  const [mediaVerificationNoteInput, setMediaVerificationNoteInput] = useState<string>('');
+  const [showVerifyDialog, setShowVerifyDialog] = useState<boolean>(false);
+
   // Phase 2: Stage Telemetry Expansion
   const [expandedStage, setExpandedStage] = useState<string | null>(null);
 
@@ -92,6 +103,16 @@ export const CaseDetailDrawer: React.FC = () => {
     }
   }, [selectedGrievance?.aiAnalysis?.pipelineMetaJson]);
 
+  // Phase 3: Parse Multimodal Media Analysis
+  const mediaAnalysis = useMemo(() => {
+    if (!selectedGrievance?.mediaAnalysisJson) return null;
+    try {
+      return JSON.parse(selectedGrievance.mediaAnalysisJson);
+    } catch {
+      return null;
+    }
+  }, [selectedGrievance?.mediaAnalysisJson]);
+
   // Phase 2: Combine all duplicate candidates
   const allDuplicates = useMemo(() => {
     const list: any[] = [];
@@ -107,6 +128,22 @@ export const CaseDetailDrawer: React.FC = () => {
     }
     return list;
   }, [selectedGrievance]);
+
+  const handleVerifyMedia = async (verified: boolean) => {
+    if (!selectedGrievance) return;
+    setIsVerifyingMedia(true);
+    try {
+      await api.verifyMedia(selectedGrievance.id, verified, mediaVerificationNoteInput || undefined);
+      setActionSuccessMsg(verified ? 'Official visual evidence verified and recorded in audit.' : 'Evidence marked unverified.');
+      setShowVerifyDialog(false);
+      setMediaVerificationNoteInput('');
+      refreshAll();
+    } catch (err: any) {
+      alert(err.message || 'Failed to verify media');
+    } finally {
+      setIsVerifyingMedia(false);
+    }
+  };
 
   if (!selectedGrievance) return null;
 
@@ -328,37 +365,242 @@ export const CaseDetailDrawer: React.FC = () => {
             </p>
           </div>
 
-          {/* Complainant & Location Card */}
+          {/* Complainant & Location Card with Phase 3 Provenance & Privacy */}
           <div className="grid grid-cols-2 gap-4">
             <div className="command-card p-4">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                Citizen Informant
-              </span>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Citizen Informant
+                </span>
+                <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
+                  selectedGrievance.isAnonymous
+                    ? 'bg-purple-950 text-purple-300 border border-purple-500/40'
+                    : 'bg-slate-800 text-slate-300 border border-slate-700'
+                }`}>
+                  {selectedGrievance.isAnonymous ? 'ANONYMOUS PROTECTED' : 'CITIZEN SUBMISSION'}
+                </span>
+              </div>
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-200">
                 <User className="w-3.5 h-3.5 text-cyan-400" />
                 <span>{selectedGrievance.complainantName}</span>
               </div>
               <p className="text-xs text-slate-400 mt-1 font-mono">{selectedGrievance.complainantPhone}</p>
-              <div className="mt-2 text-[10px] font-mono text-slate-500 uppercase">
-                Lang: {selectedGrievance.originalLanguage.toUpperCase()}
+              <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <span>Source: <span className="text-cyan-300 font-semibold">{selectedGrievance.sourcePlatform || 'PORTAL'}</span></span>
+                <span>Lang: {selectedGrievance.originalLanguage.toUpperCase()}</span>
               </div>
             </div>
 
             <div className="command-card p-4">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                Geospatial Locality
-              </span>
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
-                <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                <span className="truncate">{selectedGrievance.location.locality}, {selectedGrievance.location.district}</span>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Geospatial Intelligence
+                </span>
+                <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
+                  (selectedGrievance.locationProvenance || 'GPS_EXACT') === 'UNRESOLVED'
+                    ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40'
+                    : 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/40'
+                }`}>
+                  {selectedGrievance.locationProvenance || 'GPS_EXACT'}
+                </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1 truncate">{selectedGrievance.location.address}</p>
-              <div className="mt-2 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                <span>{selectedGrievance.location.latitude.toFixed(4)}°N, {selectedGrievance.location.longitude.toFixed(4)}°E</span>
-                <span className="text-cyan-400">Confidence: {(selectedGrievance.location.confidence * 100).toFixed(0)}%</span>
-              </div>
+              {selectedGrievance.location ? (
+                <>
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
+                    <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    <span className="truncate">{selectedGrievance.location.locality}, {selectedGrievance.location.district}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1 truncate">{selectedGrievance.location.address}</p>
+                  <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                    <span>{selectedGrievance.location.latitude.toFixed(4)}°N, {selectedGrievance.location.longitude.toFixed(4)}°E</span>
+                    <span className="text-cyan-400">Confidence: {((selectedGrievance.locationConfidence || selectedGrievance.location.confidence) * 100).toFixed(0)}%</span>
+                  </div>
+                </>
+              ) : (
+                <div className="p-2 bg-rose-950/30 rounded border border-rose-500/30 text-rose-300 text-xs mt-1">
+                  <div className="flex items-center gap-1.5 font-bold mb-1">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Location Unresolved</span>
+                  </div>
+                  <p className="text-[10px] text-rose-200/80">
+                    No physical coordinates identified in complaint text. Stored without false geolocation markers.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* PHASE 3: Multimodal Media Evidence & Vision AI Inspector */}
+          {selectedGrievance.mediaUrl && (
+            <div className="command-card p-4 border-indigo-500/40 bg-gradient-to-br from-slate-900/90 to-indigo-950/20">
+              <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  {selectedGrievance.mediaType === 'VIDEO' ? (
+                    <Video className="w-4 h-4 text-indigo-400" />
+                  ) : (
+                    <Camera className="w-4 h-4 text-indigo-400" />
+                  )}
+                  <span className="text-xs font-bold text-indigo-300">
+                    Multimodal Evidence & Vision AI (Phase 3)
+                  </span>
+                </div>
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-500/30 font-bold">
+                  {selectedGrievance.mediaType || 'IMAGE'} EVIDENCE
+                </span>
+              </div>
+
+              {/* Media Preview & Model Predictions Layout */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Media Preview */}
+                <div className="rounded-lg overflow-hidden border border-slate-800 bg-black flex items-center justify-center max-h-48 relative group">
+                  {selectedGrievance.mediaType === 'VIDEO' ? (
+                    <video
+                      src={selectedGrievance.mediaUrl}
+                      controls
+                      className="w-full h-full max-h-48 object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={selectedGrievance.mediaUrl}
+                      alt="Uploaded Civic Evidence"
+                      className="w-full h-full max-h-48 object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                  )}
+                  <div className="absolute top-2 right-2 bg-black/70 backdrop-blur px-2 py-0.5 rounded text-[10px] font-mono text-slate-300">
+                    Evidence Attached
+                  </div>
+                </div>
+
+                {/* AI Vision Observations Breakdown */}
+                <div className="space-y-2.5">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                      Model Observed Infrastructure Distress
+                    </span>
+                    {mediaAnalysis?.detectedCivicIssues && mediaAnalysis.detectedCivicIssues.length > 0 ? (
+                      mediaAnalysis.detectedCivicIssues.map((iss: any, idx: number) => (
+                        <div key={idx} className="p-2 bg-slate-950/80 rounded border border-indigo-500/20 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="font-semibold text-slate-200">{iss.issue}</span>
+                            <span className="text-[10px] font-mono font-bold text-indigo-400">
+                              {(iss.confidence * 100).toFixed(0)}% conf
+                            </span>
+                          </div>
+                          {iss.boundingBoxDesc && (
+                            <p className="text-[10px] text-slate-500 font-mono mt-0.5">{iss.boundingBoxDesc}</p>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-slate-400 italic">Visual anomaly detected in photographic evidence.</p>
+                    )}
+                  </div>
+
+                  {mediaAnalysis?.observedObjects && mediaAnalysis.observedObjects.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {mediaAnalysis.observedObjects.map((obj: string, i: number) => (
+                        <span key={i} className="text-[9px] font-mono px-2 py-0.5 bg-slate-800/80 text-slate-300 rounded border border-slate-700">
+                          #{obj}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <p className="text-[10px] text-slate-400 leading-tight">
+                    {mediaAnalysis?.modelObservationsSummary || 'Analyzed via JANRAKSHA AI Vision pipeline.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Distinguish Model Observed vs Official Verified */}
+              <div className="mt-3.5 pt-3 border-t border-slate-800">
+                {selectedGrievance.mediaVerified ? (
+                  <div className="p-2.5 bg-emerald-950/40 border border-emerald-500/40 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <div>
+                        <span className="text-xs font-bold text-emerald-300">
+                          Official Verification Confirmed
+                        </span>
+                        <p className="text-[10px] text-emerald-400/80 font-mono">
+                          Verified by {selectedGrievance.mediaVerifiedBy || 'Officer'} on {selectedGrievance.mediaVerifiedAt ? new Date(selectedGrievance.mediaVerifiedAt).toLocaleString() : 'Record'}
+                        </p>
+                        {selectedGrievance.mediaVerificationNote && (
+                          <p className="text-[11px] text-slate-300 mt-1 italic">
+                            "{selectedGrievance.mediaVerificationNote}"
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleVerifyMedia(false)}
+                      disabled={isVerifyingMedia}
+                      className="text-[10px] px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+                    >
+                      Revoke
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-2.5 bg-amber-950/40 border border-amber-500/40 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                      <div>
+                        <span className="text-xs font-bold text-amber-300">
+                          Model Observation Only (Unverified)
+                        </span>
+                        <p className="text-[10px] text-amber-400/80">
+                          Observations are AI-generated predictions. Official field verification required prior to dispatch.
+                        </p>
+                      </div>
+                    </div>
+                    {['SUPER_ADMIN', 'DISTRICT_MAGISTRATE', 'DEPARTMENT_OFFICER'].includes(activePersona?.role || '') && (
+                      <button
+                        onClick={() => setShowVerifyDialog(true)}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1 shadow-md shadow-emerald-900/30"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Verify Evidence</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Inline Verify Modal / Dialog */}
+              {showVerifyDialog && (
+                <div className="mt-3 p-3 bg-slate-950 rounded-lg border border-emerald-500/40 space-y-2.5 animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-300">Officer Evidence Verification</span>
+                    <button onClick={() => setShowVerifyDialog(false)} className="text-slate-400 hover:text-slate-200 text-xs">
+                      ✕
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={mediaVerificationNoteInput}
+                    onChange={(e) => setMediaVerificationNoteInput(e.target.value)}
+                    placeholder="Enter official observation note (e.g., Confirmed 2ft road fissure on Bailey Road)..."
+                    className="w-full text-xs p-2 rounded bg-slate-900 border border-slate-700 text-slate-200 focus:outline-none focus:border-emerald-500"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowVerifyDialog(false)}
+                      className="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => handleVerifyMedia(true)}
+                      disabled={isVerifyingMedia}
+                      className="text-xs font-semibold px-3 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+                    >
+                      {isVerifyingMedia ? 'Recording...' : 'Confirm Verification'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* PHASE 2: 8-Stage Analysis Pipeline Inspection */}
           <div className="command-card p-4 border-cyan-500/40 bg-gradient-to-br from-slate-900/90 to-cyan-950/20">
@@ -418,7 +660,7 @@ export const CaseDetailDrawer: React.FC = () => {
                   <div className="space-y-1 text-slate-300">
                     <p><span className="text-slate-400">Method:</span> Deterministic validation & boundary checks</p>
                     <p><span className="text-slate-400">Payload Status:</span> Validated against schema rules</p>
-                    <p><span className="text-slate-400">Origin District:</span> {selectedGrievance.location.district}</p>
+                    <p><span className="text-slate-400">Origin District:</span> {selectedGrievance.location?.district || 'Unassigned'}</p>
                   </div>
                 )}
                 {expandedStage === 'NORMALISE' && (
@@ -438,8 +680,8 @@ export const CaseDetailDrawer: React.FC = () => {
                 )}
                 {expandedStage === 'EXTRACT' && (
                   <div className="space-y-1 text-slate-300">
-                    <p><span className="text-slate-400">Target Locality:</span> {selectedGrievance.location.locality}</p>
-                    <p><span className="text-slate-400">District:</span> {selectedGrievance.location.district}</p>
+                    <p><span className="text-slate-400">Target Locality:</span> {selectedGrievance.location?.locality || 'Not specified'}</p>
+                    <p><span className="text-slate-400">District:</span> {selectedGrievance.location?.district || 'Not specified'}</p>
                     <p><span className="text-slate-400">Entities JSON:</span> <span className="font-mono text-[10px] text-cyan-300">{ai?.entitiesJson || '{}'}</span></p>
                   </div>
                 )}

@@ -21,6 +21,12 @@ interface AppContextType {
   isCreateModalOpen: boolean;
   openCreateModal: () => void;
   closeCreateModal: () => void;
+  isDemoModalOpen: boolean;
+  openDemoModal: () => void;
+  closeDemoModal: () => void;
+  isSystemStatusModalOpen: boolean;
+  openSystemStatusModal: () => void;
+  closeSystemStatusModal: () => void;
   activePersona: UserModel | null;
   personas: UserModel[];
   switchPersona: (user: UserModel) => void;
@@ -42,6 +48,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedGrievanceId, setSelectedGrievanceId] = useState<string | null>(null);
   const [selectedGrievance, setSelectedGrievance] = useState<GrievanceModel | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
+  const [isSystemStatusModalOpen, setIsSystemStatusModalOpen] = useState(false);
   const [personas, setPersonas] = useState<UserModel[]>([]);
   const [activePersona, setActivePersona] = useState<UserModel | null>(null);
   const [districtFilter, setDistrictFilter] = useState<string>('ALL');
@@ -120,6 +128,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const openCreateModal = () => setIsCreateModalOpen(true);
   const closeCreateModal = () => setIsCreateModalOpen(false);
 
+  const openDemoModal = () => setIsDemoModalOpen(true);
+  const closeDemoModal = () => setIsDemoModalOpen(false);
+
+  const openSystemStatusModal = () => setIsSystemStatusModalOpen(true);
+  const closeSystemStatusModal = () => setIsSystemStatusModalOpen(false);
+
   const refreshAll = () => {
     setRefreshTrigger(prev => prev + 1);
   };
@@ -138,6 +152,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isCreateModalOpen,
         openCreateModal,
         closeCreateModal,
+        isDemoModalOpen,
+        openDemoModal,
+        closeDemoModal,
+        isSystemStatusModalOpen,
+        openSystemStatusModal,
+        closeSystemStatusModal,
         activePersona,
         personas,
         switchPersona,

@@ -17,6 +17,10 @@ export function createApp() {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+  // Static serving for secure media uploads
+  const path = require('path');
+  app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
+
   // Mount API prefix
   app.use(config.apiPrefix, routes);
 

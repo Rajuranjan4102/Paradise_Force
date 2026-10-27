@@ -71,8 +71,12 @@ model AIAnalysis {
   duplicateScore         Float       @default(0.0)
   isDuplicateCandidate   Boolean     @default(false)
   duplicateReason        String?
-  engineMode             String      @default("DEMO_RULE_BASED") // Clear indicator of demo analyzer
-  pipelineMetaJson       String      @default("{}") // 8-stage pipeline telemetry: INGEST->NORMALISE->CLASSIFY->EXTRACT->MATCH->SCORE->ROUTE->ALERT
+  engineMode             String      @default("REAL_LOCAL_MODEL") // REAL_LOCAL_MODEL, EXTERNAL_AI_PROVIDER, DEMO_RULE_BASED
+  pipelineMetaJson       String      @default("{}") // 8-stage pipeline telemetry
+  modelProvider          String      @default("LOCAL_TFIDF_RULES") // LOCAL_TFIDF_RULES, GEMINI_1_5_FLASH, OPENAI_GPT4O_MINI
+  modelVersion           String      @default("v3.0.0")
+  languageDetected       String      @default("en")
+  sentimentLabel         String      @default("Neutral")
   analyzedAt             DateTime    @default(now())
 
   grievance              Grievance   @relation(fields: [grievanceId], references: [id], onDelete: Cascade)
@@ -116,8 +120,8 @@ model Grievance {
   complainantPhone       String
   isAnonymous            Boolean     @default(false)
 
-  locationId             String
-  location               Location    @relation(fields: [locationId], references: [id])
+  locationId             String?
+  location               Location?   @relation(fields: [locationId], references: [id])
 
   departmentId           String?
   department             Department? @relation(fields: [departmentId], references: [id])
@@ -137,6 +141,27 @@ model Grievance {
   priorityOverridden     Boolean     @default(false)
   priorityOverrideReason String?
   priorityOverriddenBy   String?
+
+  // Phase 3: Multimodal Evidence & Image/Video Intelligence
+  mediaUrl               String?
+  mediaType              String?     // IMAGE, VIDEO, NONE
+  mediaAnalysisJson      String?     // Structured AI vision detection results
+  mediaVerified          Boolean     @default(false)
+  mediaVerifiedBy        String?
+  mediaVerifiedAt        DateTime?
+  mediaVerificationNote  String?
+
+  // Phase 3: Social & External Feed Ingestion
+  sourcePlatform         String      @default("CITIZEN_PORTAL") // CITIZEN_PORTAL, TWITTER_X, WHATSAPP, PUBLIC_FEED, CSV_IMPORT, JSON_IMPORT
+  sourceReference        String?     // Tweet URL, Portal Ticket ID, External Ref
+  sourceAuthorHandle     String?
+
+  // Phase 3: Geospatial Provenance
+  locationProvenance     String      @default("GPS_EXACT") // GPS_EXACT, GEOCODED_ADDRESS, LOCALITY_CENTROID, DISTRICT_CENTROID, UNRESOLVED
+  locationConfidence     Float       @default(0.95)
+
+  // Phase 3: Privacy Redaction
+  redactedDescription    String?
 
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
@@ -176,11 +201,11 @@ model CaseNote {
 
 model AuditLog {
   id         String      @id @default(uuid())
-  action     String      // GRIEVANCE_CREATED, STATUS_UPDATED, REASSIGNED, RESOLVED, NOTE_ADDED
+  action     String      // GRIEVANCE_CREATED, STATUS_UPDATED, REASSIGNED, RESOLVED, NOTE_ADDED, MEDIA_VERIFIED, BULK_IMPORTED
   actorId    String
   actorName  String
   actorRole  String
-  entityType String      // GRIEVANCE, DEPARTMENT, CLUSTER, USER
+  entityType String      // GRIEVANCE, DEPARTMENT, CLUSTER, USER, MEDIA, INGESTION
   entityId   String
   oldValues  String?     // JSON serialized previous state
   newValues  String?     // JSON serialized new state
@@ -198,4 +223,16 @@ model Alert {
   isRead     Boolean     @default(false)
   metadata   String?     // JSON serialized extra context
   createdAt  DateTime    @default(now())
+}
+
+model IngestionRecord {
+  id             String    @id @default(uuid())
+  source         String    // CSV_IMPORT, JSON_IMPORT, PUBLIC_FEED, TWITTER_X
+  filename       String?
+  totalRecords   Int       @default(0)
+  importedCount  Int       @default(0)
+  duplicateCount Int       @default(0)
+  failedCount    Int       @default(0)
+  summaryJson    String?
+  createdAt      DateTime  @default(now())
 }

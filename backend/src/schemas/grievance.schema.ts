@@ -21,26 +21,41 @@ export const GrievanceStatusEnum = z.enum([
 ]);
 
 export const CreateGrievanceSchema = z.object({
-  title: z.string().min(5, 'Title must be at least 5 characters long').max(150),
-  description: z.string().min(10, 'Description must be at least 10 characters long'),
+  title: z.string().min(3, 'Title must be at least 3 characters long').max(150),
+  description: z.string().min(5, 'Description must be at least 5 characters long'),
   complainantName: z.string().min(2, 'Complainant name must be at least 2 characters'),
   complainantPhone: z.string().min(10, 'Phone number must have at least 10 digits'),
   isAnonymous: z.boolean().optional().default(false),
-  originalLanguage: z.enum(['en', 'hi']).optional().default('en'),
+  originalLanguage: z.enum(['en', 'hi', 'bho']).optional().default('en'),
   
-  // Location
-  latitude: z.number().min(20).max(30), // Bihar bounds roughly 24-28 N
-  longitude: z.number().min(80).max(90), // Bihar bounds roughly 83-88 E
-  address: z.string().min(5),
-  locality: z.string().min(2),
+  // Location (supports exact GPS or geocoded resolution; can be omitted for unresolved)
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  address: z.string().optional().default(''),
+  locality: z.string().optional().default(''),
   landmark: z.string().optional(),
-  district: z.string().min(2),
+  district: z.string().optional().default('Patna Central'),
   pincode: z.string().optional(),
 
   // Optional manual overrides (if not provided, AI engine computes)
   category: GrievanceCategoryEnum.optional(),
   severity: SeverityEnum.optional(),
   departmentId: z.string().optional(),
+
+  // Phase 3 Multimodal & Source Fields
+  mediaUrl: z.string().optional(),
+  mediaType: z.enum(['IMAGE', 'VIDEO', 'NONE']).optional(),
+  mediaAnalysisJson: z.string().optional(),
+  sourcePlatform: z.string().optional().default('CITIZEN_PORTAL'),
+  sourceReference: z.string().optional(),
+  sourceAuthorHandle: z.string().optional(),
+  locationProvenance: z.string().optional(),
+  locationConfidence: z.number().optional(),
+});
+
+export const VerifyMediaSchema = z.object({
+  verified: z.boolean(),
+  note: z.string().optional(),
 });
 
 export const UpdateStatusSchema = z.object({

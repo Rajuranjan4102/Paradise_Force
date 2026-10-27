@@ -6,7 +6,13 @@ import { alertController } from '../controllers/alert.controller';
 import { departmentController } from '../controllers/department.controller';
 import { auditController } from '../controllers/audit.controller';
 import { authController } from '../controllers/auth.controller';
+import { ingestionController } from '../controllers/ingestion.controller';
+import { evaluationController } from '../controllers/evaluation.controller';
+import { systemController } from '../controllers/system.controller';
+import { demoController } from '../controllers/demo.controller';
+import { geocodingService } from '../services/geospatial/geocodingService';
 import { authenticate, authorize } from '../middleware/auth';
+import { uploadMediaMiddleware } from '../middleware/upload';
 
 const router = Router();
 
@@ -24,10 +30,18 @@ router.get('/health', (req, res) => {
 router.get('/auth/personas', authController.getPersonas);
 router.get('/auth/me', authenticate, authController.getMe);
 
-// Grievance Endpoints
+// Grievance Endpoints (with secure file upload support)
 router.get('/grievances', authenticate, grievanceController.list);
-router.post('/grievances', authenticate, grievanceController.create);
+router.post('/grievances', authenticate, uploadMediaMiddleware.single('media'), grievanceController.create);
 router.get('/grievances/:id', authenticate, grievanceController.getById);
+
+// Phase 3: Multimodal Media Verification
+router.post(
+  '/grievances/:id/media-verify',
+  authenticate,
+  authorize('SUPER_ADMIN', 'DISTRICT_MAGISTRATE', 'DEPARTMENT_OFFICER'),
+  grievanceController.verifyMedia
+);
 
 // Protected Status & Assignment Mutations (Role Restricted)
 router.post(
@@ -117,5 +131,35 @@ router.get(
   authorize('SUPER_ADMIN', 'DISTRICT_MAGISTRATE'),
   auditController.list
 );
+
+// Phase 3: Social Ingestion & Connectors
+router.get('/ingestion/connectors', authenticate, ingestionController.getConnectors);
+router.post(
+  '/ingestion/import',
+  authenticate,
+  authorize('SUPER_ADMIN', 'DISTRICT_MAGISTRATE', 'DEPARTMENT_OFFICER'),
+  uploadMediaMiddleware.single('file'),
+  ingestionController.importBatch
+);
+router.get('/ingestion/history', authenticate, ingestionController.getHistory);
+
+// Phase 3: Evaluation & Model Benchmarking
+router.get('/evaluation/benchmark', authenticate, evaluationController.runBenchmark);
+router.get('/evaluation/dataset', authenticate, evaluationController.getDataset);
+
+// Phase 3: Geospatial Resolution
+router.post('/geo/resolve', authenticate, (req, res) => {
+  const { text, district, locality, lat, lng } = req.body;
+  const result = geocodingService.resolveLocation(text, district, locality, lat, lng);
+  res.json({ success: true, data: result });
+});
+
+// Phase 4: Judge-Facing System Status & Health Diagnostics
+router.get('/system/status', systemController.getStatus);
+
+// Phase 4: Guided Incident Lifecycle Demonstration & Safe Environment Reset
+router.get('/demo/overview', authenticate, demoController.getOverview);
+router.post('/demo/step', authenticate, demoController.runStep);
+router.post('/demo/reset', authenticate, demoController.reset);
 
 export default router;

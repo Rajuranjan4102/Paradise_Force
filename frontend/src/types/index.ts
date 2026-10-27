@@ -48,6 +48,10 @@ export interface AIAnalysisModel {
   isDuplicateCandidate: boolean;
   duplicateReason?: string | null;
   engineMode: string;
+  modelProvider?: string;
+  modelVersion?: string;
+  languageDetected?: string;
+  sentimentLabel?: string;
   pipelineMetaJson?: string;
   analyzedAt: string;
 }
@@ -144,8 +148,8 @@ export interface GrievanceModel {
   complainantName: string;
   complainantPhone: string;
   isAnonymous: boolean;
-  locationId: string;
-  location: LocationModel;
+  locationId?: string | null;
+  location?: LocationModel | null;
   departmentId?: string | null;
   department?: DepartmentModel | null;
   assignedOfficerId?: string | null;
@@ -159,6 +163,24 @@ export interface GrievanceModel {
   priorityOverridden?: boolean;
   priorityOverrideReason?: string | null;
   priorityOverriddenBy?: string | null;
+
+  // Phase 3 Multimodal Evidence
+  mediaUrl?: string | null;
+  mediaType?: 'IMAGE' | 'VIDEO' | 'NONE' | null;
+  mediaAnalysisJson?: string | null;
+  mediaVerified?: boolean;
+  mediaVerifiedBy?: string | null;
+  mediaVerifiedAt?: string | null;
+  mediaVerificationNote?: string | null;
+
+  // Phase 3 Ingestion & Geospatial Provenance
+  sourcePlatform?: string;
+  sourceReference?: string | null;
+  sourceAuthorHandle?: string | null;
+  locationProvenance?: string;
+  locationConfidence?: number;
+  redactedDescription?: string | null;
+
   createdAt: string;
   updatedAt: string;
   notes?: CaseNoteModel[];
@@ -222,4 +244,125 @@ export interface DashboardMetrics {
   }[];
   recentCases: GrievanceModel[];
   incidentClusters: IncidentClusterModel[];
+}
+
+export interface ConnectorStatus {
+  id: string;
+  name: string;
+  type: 'API' | 'RSS_FEED' | 'FILE_IMPORT' | 'WEBHOOK';
+  status: 'ACTIVE' | 'STANDBY' | 'DISCONNECTED' | 'ERROR';
+  lastSyncAt: string | null;
+  recordsIngested: number;
+  rateLimitInfo: string;
+  notes: string;
+}
+
+export interface VisionAnalysisResult {
+  hasVisualEvidence: boolean;
+  mediaType: 'IMAGE' | 'VIDEO' | 'NONE';
+  detectedCivicIssues: Array<{
+    issue: string;
+    confidence: number;
+    severity: SeverityLevel;
+    boundingBoxDesc?: string;
+  }>;
+  observedObjects: string[];
+  overallVisualSeverity: SeverityLevel;
+  recommendedCategory: string;
+  framesSampled?: number;
+  modelObservationsSummary: string;
+  modelConfidence: number;
+  modelName: string;
+  analyzedAt: string;
+}
+
+export interface EvaluationResults {
+  totalCases: number;
+  overallAccuracyPercent: number;
+  categoryMetrics: Record<string, { precision: number; recall: number; f1: number; total: number }>;
+  languageAccuracy: {
+    englishAccuracy: number;
+    hindiAccuracy: number;
+  };
+  locationResolutionRatePercent: number;
+  duplicateGroupPrecisionPercent: number;
+  averageLatencyMs: number;
+  p95LatencyMs: number;
+  honestLimitations: string[];
+  evaluatedAt: string;
+}
+
+export interface SystemStatusData {
+  timestamp: string;
+  environment: string;
+  status: string;
+  overallHealth: string;
+  database: {
+    status: string;
+    provider: string;
+    connectionUrl: string;
+    pingLatencyMs: number;
+    records: {
+      grievances: number;
+      incidentClusters: number;
+      duplicateCandidates: number;
+      alerts: number;
+      users: number;
+      departments: number;
+      auditLogs: number;
+      ingestionRecords: number;
+    };
+  };
+  analysisEngine: {
+    status: string;
+    providerName: string;
+    modelVersion: string;
+    engineMode: string;
+    averageInferenceLatencyMs: number;
+    supportedLanguages: string[];
+    supportedCategories: string[];
+    fallbackState: string;
+  };
+  mapService: {
+    status: string;
+    cartographyProvider: string;
+    gazetteerLandmarksCount: number;
+    coordinateResolutionPolicy: string;
+    prohibitsInventedCoordinates: boolean;
+    defaultJurisdiction: string;
+  };
+  ingestionConnectors: ConnectorStatus[];
+  runtime: {
+    nodeVersion: string;
+    uptimeSeconds: number;
+    memory: {
+      heapUsedMB: number;
+      heapTotalMB: number;
+      rssMB: number;
+    };
+    apiPrefix: string;
+    port: number | string;
+  };
+}
+
+export interface DemoStepResult {
+  step: number;
+  title: string;
+  summary: string;
+  details: Record<string, any>;
+  nextStepAvailable: boolean;
+}
+
+export interface DemoOverview {
+  scenarioName: string;
+  location: string;
+  department: string;
+  totalSteps: number;
+  databaseMetrics: {
+    totalGrievances: number;
+    totalClusters: number;
+    totalAlerts: number;
+    totalAuditEvents: number;
+  };
+  activeDemoCluster: IncidentClusterModel | null;
 }

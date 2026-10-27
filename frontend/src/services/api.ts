@@ -6,6 +6,11 @@ import {
   AlertModel,
   AuditLogModel,
   UserModel,
+  ConnectorStatus,
+  EvaluationResults,
+  SystemStatusData,
+  DemoStepResult,
+  DemoOverview,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -85,10 +90,20 @@ class ApiService {
   }
 
   async createGrievance(payload: any): Promise<GrievanceModel> {
+    const persona = this.getPersona();
+    const isFormData = typeof FormData !== 'undefined' && payload instanceof FormData;
+    const headers: HeadersInit = {
+      'x-user-role': persona.role,
+      'x-user-email': persona.email,
+    };
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
+    }
+
     const res = await fetch(`${API_BASE}/grievances`, {
       method: 'POST',
-      headers: this.getHeaders(),
-      body: JSON.stringify(payload),
+      headers,
+      body: isFormData ? payload : JSON.stringify(payload),
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.message || 'Failed to create grievance');
@@ -274,6 +289,118 @@ class ApiService {
     const res = await fetch(url, { headers: this.getHeaders() });
     const data = await res.json();
     if (!data.success) throw new Error(data.message || 'Failed to fetch recommendation');
+    return data.data;
+  }
+
+  // Phase 3: Multimodal Evidence Official Verification
+  async verifyMedia(id: string, verified: boolean, note?: string): Promise<GrievanceModel> {
+    const res = await fetch(`${API_BASE}/grievances/${id}/media-verify`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ verified, note }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to verify media');
+    return data.data;
+  }
+
+  // Phase 3: Social & Feed Connectors
+  async fetchConnectors(): Promise<ConnectorStatus[]> {
+    const res = await fetch(`${API_BASE}/ingestion/connectors`, {
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to fetch connector statuses');
+    return data.data;
+  }
+
+  async importBatch(formDataOrJson: FormData | { csvText?: string; records?: any[]; source?: string }): Promise<any> {
+    const persona = this.getPersona();
+    const isFormData = typeof FormData !== 'undefined' && formDataOrJson instanceof FormData;
+    const headers: HeadersInit = {
+      'x-user-role': persona.role,
+      'x-user-email': persona.email,
+    };
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    const res = await fetch(`${API_BASE}/ingestion/import`, {
+      method: 'POST',
+      headers,
+      body: isFormData ? formDataOrJson : JSON.stringify(formDataOrJson),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Batch import failed');
+    return data.data;
+  }
+
+  async fetchIngestionHistory(): Promise<any[]> {
+    const res = await fetch(`${API_BASE}/ingestion/history`, {
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to fetch import history');
+    return data.data;
+  }
+
+  // Phase 3: Benchmark & Evaluation Runner
+  async runBenchmarkEvaluation(): Promise<EvaluationResults> {
+    const res = await fetch(`${API_BASE}/evaluation/benchmark`, {
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Benchmark evaluation failed');
+    return data.data;
+  }
+
+  async fetchBenchmarkDataset(): Promise<any> {
+    const res = await fetch(`${API_BASE}/evaluation/dataset`, {
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to fetch benchmark dataset');
+    return data.data;
+  }
+
+  // Phase 4: System Status & Health Diagnostics
+  async fetchSystemStatus(): Promise<SystemStatusData> {
+    const res = await fetch(`${API_BASE}/system/status`, {
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to fetch system status');
+    return data.data;
+  }
+
+  // Phase 4: Guided Demonstration & Environment Reset
+  async fetchDemoOverview(): Promise<DemoOverview> {
+    const res = await fetch(`${API_BASE}/demo/overview`, {
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to fetch demo overview');
+    return data.data;
+  }
+
+  async runDemoStep(step: number): Promise<DemoStepResult> {
+    const res = await fetch(`${API_BASE}/demo/step`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ step }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || `Failed to execute demo step ${step}`);
+    return data.data;
+  }
+
+  async resetDemoData(): Promise<{ success: boolean; message: string; timestamp: string }> {
+    const res = await fetch(`${API_BASE}/demo/reset`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to reset demo data');
     return data.data;
   }
 }

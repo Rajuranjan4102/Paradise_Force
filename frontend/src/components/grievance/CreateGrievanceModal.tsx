@@ -9,6 +9,10 @@ import {
   CheckCircle,
   Flame,
   Languages,
+  Upload,
+  Camera,
+  Shield,
+  Film,
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -31,9 +35,14 @@ export const CreateGrievanceModal: React.FC = () => {
   const [district, setDistrict] = useState('Patna Central');
   const [locality, setLocality] = useState('Bailey Road');
   const [address, setAddress] = useState('Near Pillar 38, Bailey Road');
-  const [latitude, setLatitude] = useState(25.6125);
-  const [longitude, setLongitude] = useState(85.0872);
+  const [latitude, setLatitude] = useState<number | null>(25.6125);
+  const [longitude, setLongitude] = useState<number | null>(85.0872);
   const [originalLanguage, setOriginalLanguage] = useState<'en' | 'hi'>('en');
+  const [isAnonymous, setIsAnonymous] = useState(false);
+
+  // Phase 3 Multimodal Upload
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -52,6 +61,20 @@ export const CreateGrievanceModal: React.FC = () => {
   const combinedText = `${title} ${description}`.toLowerCase();
   const hasCriticalHazard = ['spark', 'fire', 'blast', 'electrocution', 'करंट', 'आग', 'ब्लास्ट'].some(k => combinedText.includes(k));
   const isHindiDetected = /[\u0900-\u097F]/.test(title + description);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = () => setFilePreview(reader.result as string);
+        reader.readAsDataURL(file);
+      } else {
+        setFilePreview('VIDEO_ATTACHED');
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,18 +95,38 @@ export const CreateGrievanceModal: React.FC = () => {
     setErrorMsg('');
 
     try {
-      const created = await api.createGrievance({
-        title,
-        description,
-        complainantName,
-        complainantPhone,
-        originalLanguage: isHindiDetected ? 'hi' : originalLanguage,
-        district,
-        locality,
-        address,
-        latitude,
-        longitude,
-      });
+      let created;
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('complainantName', complainantName);
+        formData.append('complainantPhone', complainantPhone);
+        formData.append('isAnonymous', String(isAnonymous));
+        formData.append('originalLanguage', isHindiDetected ? 'hi' : originalLanguage);
+        formData.append('district', district);
+        formData.append('locality', locality);
+        formData.append('address', address);
+        if (latitude !== null) formData.append('latitude', String(latitude));
+        if (longitude !== null) formData.append('longitude', String(longitude));
+        formData.append('media', selectedFile);
+
+        created = await api.createGrievance(formData);
+      } else {
+        created = await api.createGrievance({
+          title,
+          description,
+          complainantName,
+          complainantPhone,
+          isAnonymous,
+          originalLanguage: isHindiDetected ? 'hi' : originalLanguage,
+          district,
+          locality,
+          address,
+          latitude: latitude ?? undefined,
+          longitude: longitude ?? undefined,
+        });
+      }
 
       refreshAll();
       closeCreateModal();
@@ -265,6 +308,71 @@ export const CreateGrievanceModal: React.FC = () => {
               onChange={e => setAddress(e.target.value)}
               className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg p-2 border border-slate-800 focus:outline-none focus:border-cyan-500"
               required
+            />
+          </div>
+
+          {/* Phase 3: Multimodal Photographic / Video Evidence Upload */}
+          <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <Camera className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Photographic / Video Evidence (Phase 3 AI Vision)</span>
+              </label>
+              <span className="text-[10px] text-slate-500 font-mono">JPG, PNG, MP4 (Max 50MB)</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <label className="flex-1 cursor-pointer flex items-center justify-center gap-2 p-3 border border-dashed border-slate-700 hover:border-cyan-500/60 rounded-lg bg-slate-900/60 text-xs text-slate-300 transition-colors">
+                <Upload className="w-4 h-4 text-cyan-400" />
+                <span>{selectedFile ? selectedFile.name : 'Choose Image or Short Video'}</span>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
+
+              {selectedFile && (
+                <button
+                  type="button"
+                  onClick={() => { setSelectedFile(null); setFilePreview(null); }}
+                  className="text-xs text-rose-400 hover:text-rose-300 px-2 py-1 bg-rose-950/40 rounded border border-rose-500/30"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+
+            {filePreview && filePreview !== 'VIDEO_ATTACHED' && (
+              <div className="mt-2 rounded-lg overflow-hidden border border-slate-700 max-h-32 flex items-center justify-center bg-black">
+                <img src={filePreview} alt="Preview" className="max-h-32 object-contain" />
+              </div>
+            )}
+            {filePreview === 'VIDEO_ATTACHED' && (
+              <div className="mt-2 p-2 bg-indigo-950/40 border border-indigo-500/30 rounded text-xs text-indigo-300 flex items-center gap-2">
+                <Film className="w-4 h-4 text-indigo-400" />
+                <span>Video attached. AI pipeline will sample 3 keyframes for infrastructure hazard detection.</span>
+              </div>
+            )}
+          </div>
+
+          {/* Phase 3: Privacy & Anonymous Protection Toggle */}
+          <div className="flex items-center justify-between p-3 bg-purple-950/20 border border-purple-500/30 rounded-xl text-xs">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-purple-400 shrink-0" />
+              <div>
+                <span className="font-semibold text-purple-200">Withhold Identity (Anonymous Citizen Mode)</span>
+                <p className="text-[10px] text-purple-300/70">
+                  Phone and personal details will be automatically redacted from public logs and non-admin viewers.
+                </p>
+              </div>
+            </div>
+            <input
+              type="checkbox"
+              checked={isAnonymous}
+              onChange={(e) => setIsAnonymous(e.target.checked)}
+              className="w-4 h-4 rounded text-cyan-500 focus:ring-cyan-400 bg-slate-900 border-slate-700"
             />
           </div>
 

@@ -91,6 +91,7 @@ export const GeospatialMapView: React.FC = () => {
     const bounds = L.latLngBounds([]);
 
     grievances.forEach(item => {
+      if (!item.location) return;
       const { latitude, longitude, locality, district } = item.location;
       if (!latitude || !longitude) return;
 

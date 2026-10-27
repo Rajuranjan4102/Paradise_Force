@@ -20,6 +20,10 @@ build/
 *.db-wal
 backend/prisma/*.db
 backend/prisma/*.db-journal
+backend/*.db
+backend/*.db-journal
+backend/uploads/*
+!backend/uploads/.gitkeep
 
 # Logs
 npm-debug.log*

@@ -217,8 +217,8 @@ export const GrievanceExplorerView: React.FC = () => {
                       <div className="text-[10px] text-slate-400 mt-0.5 truncate">{g.description}</div>
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
-                      <div className="font-medium text-slate-300">{g.location.locality}</div>
-                      <div className="text-[10px] text-slate-500">{g.location.district}</div>
+                      <div className="font-medium text-slate-300">{g.location?.locality || 'Not specified'}</div>
+                      <div className="text-[10px] text-slate-500">{g.location?.district || ''}</div>
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <CategoryBadge category={g.category} />
