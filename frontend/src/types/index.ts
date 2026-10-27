@@ -291,3 +291,78 @@ export interface EvaluationResults {
   honestLimitations: string[];
   evaluatedAt: string;
 }
+
+export interface SystemStatusData {
+  timestamp: string;
+  environment: string;
+  status: string;
+  overallHealth: string;
+  database: {
+    status: string;
+    provider: string;
+    connectionUrl: string;
+    pingLatencyMs: number;
+    records: {
+      grievances: number;
+      incidentClusters: number;
+      duplicateCandidates: number;
+      alerts: number;
+      users: number;
+      departments: number;
+      auditLogs: number;
+      ingestionRecords: number;
+    };
+  };
+  analysisEngine: {
+    status: string;
+    providerName: string;
+    modelVersion: string;
+    engineMode: string;
+    averageInferenceLatencyMs: number;
+    supportedLanguages: string[];
+    supportedCategories: string[];
+    fallbackState: string;
+  };
+  mapService: {
+    status: string;
+    cartographyProvider: string;
+    gazetteerLandmarksCount: number;
+    coordinateResolutionPolicy: string;
+    prohibitsInventedCoordinates: boolean;
+    defaultJurisdiction: string;
+  };
+  ingestionConnectors: ConnectorStatus[];
+  runtime: {
+    nodeVersion: string;
+    uptimeSeconds: number;
+    memory: {
+      heapUsedMB: number;
+      heapTotalMB: number;
+      rssMB: number;
+    };
+    apiPrefix: string;
+    port: number | string;
+  };
+}
+
+export interface DemoStepResult {
+  step: number;
+  title: string;
+  summary: string;
+  details: Record<string, any>;
+  nextStepAvailable: boolean;
+}
+
+export interface DemoOverview {
+  scenarioName: string;
+  location: string;
+  department: string;
+  totalSteps: number;
+  databaseMetrics: {
+    totalGrievances: number;
+    totalClusters: number;
+    totalAlerts: number;
+    totalAuditEvents: number;
+  };
+  activeDemoCluster: IncidentClusterModel | null;
+}

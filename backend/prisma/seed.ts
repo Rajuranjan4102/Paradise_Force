@@ -1,6 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+export const prisma = new PrismaClient();
+
+export async function seedDatabase() {
+  return main();
+}
 
 async function main() {
   console.log('🌱 Starting JANRAKSHA AI Synthetic Demo Data Seeding...');
@@ -915,11 +919,19 @@ async function main() {
   console.log('Summary: 6 Departments, 5 Demo Personas, 3 Incident Clusters, 16 Bilingual Grievances, 3 Alerts, 2 Duplicate Candidates.');
 }
 
-main()
-  .catch(e => {
-    console.error('Seed error:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (typeof require !== 'undefined' && require.main === module) {
+  main()
+    .catch(e => {
+      console.error('Seed error:', e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+} else if (typeof process !== 'undefined' && process.argv && process.argv[1]?.includes('seed.ts')) {
+  main()
+    .catch(e => {
+      console.error('Seed error:', e);
+      process.exit(1);
+    });
+}

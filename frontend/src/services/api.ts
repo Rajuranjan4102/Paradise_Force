@@ -8,6 +8,9 @@ import {
   UserModel,
   ConnectorStatus,
   EvaluationResults,
+  SystemStatusData,
+  DemoStepResult,
+  DemoOverview,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -357,6 +360,47 @@ class ApiService {
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.message || 'Failed to fetch benchmark dataset');
+    return data.data;
+  }
+
+  // Phase 4: System Status & Health Diagnostics
+  async fetchSystemStatus(): Promise<SystemStatusData> {
+    const res = await fetch(`${API_BASE}/system/status`, {
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to fetch system status');
+    return data.data;
+  }
+
+  // Phase 4: Guided Demonstration & Environment Reset
+  async fetchDemoOverview(): Promise<DemoOverview> {
+    const res = await fetch(`${API_BASE}/demo/overview`, {
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to fetch demo overview');
+    return data.data;
+  }
+
+  async runDemoStep(step: number): Promise<DemoStepResult> {
+    const res = await fetch(`${API_BASE}/demo/step`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ step }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || `Failed to execute demo step ${step}`);
+    return data.data;
+  }
+
+  async resetDemoData(): Promise<{ success: boolean; message: string; timestamp: string }> {
+    const res = await fetch(`${API_BASE}/demo/reset`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to reset demo data');
     return data.data;
   }
 }

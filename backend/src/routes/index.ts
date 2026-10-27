@@ -8,6 +8,8 @@ import { auditController } from '../controllers/audit.controller';
 import { authController } from '../controllers/auth.controller';
 import { ingestionController } from '../controllers/ingestion.controller';
 import { evaluationController } from '../controllers/evaluation.controller';
+import { systemController } from '../controllers/system.controller';
+import { demoController } from '../controllers/demo.controller';
 import { geocodingService } from '../services/geospatial/geocodingService';
 import { authenticate, authorize } from '../middleware/auth';
 import { uploadMediaMiddleware } from '../middleware/upload';
@@ -151,5 +153,13 @@ router.post('/geo/resolve', authenticate, (req, res) => {
   const result = geocodingService.resolveLocation(text, district, locality, lat, lng);
   res.json({ success: true, data: result });
 });
+
+// Phase 4: Judge-Facing System Status & Health Diagnostics
+router.get('/system/status', systemController.getStatus);
+
+// Phase 4: Guided Incident Lifecycle Demonstration & Safe Environment Reset
+router.get('/demo/overview', authenticate, demoController.getOverview);
+router.post('/demo/step', authenticate, demoController.runStep);
+router.post('/demo/reset', authenticate, demoController.reset);
 
 export default router;

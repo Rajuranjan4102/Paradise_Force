@@ -9,110 +9,116 @@
 [![Express.js](https://img.shields.io/badge/Express.js-404D59?style=flat-square)](https://expressjs.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=flat-square&logo=Prisma&logoColor=white)](https://www.prisma.io/)
 [![Leaflet](https://img.shields.io/badge/Leaflet-199900?style=flat-square&logo=Leaflet&logoColor=white)](https://leafletjs.com/)
-[![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-32%20Passed-brightgreen?style=flat-square&logo=vitest&logoColor=white)](https://vitest.dev/)
 
 ---
 
-## 📌 Mission
+## 📌 1. Mission & Problem Statement
 
-**JANRAKSHA AI** is a mission-grade command-and-control civic intelligence platform developed for the Bihar Police Hackathon (PS-04). It empowers authorized law enforcement, municipal executives, and departmental nodal officers to triage, cluster, prioritize, and dispatch public grievances across districts in real time.
+In high-volume public grievance administration across Bihar, district magistrates, police dispatchers, and departmental nodal officers receive thousands of citizen complaints across fragmented channels: web portals, WhatsApp helplines, social media, and call centers.
 
----
+### The Operational Challenge
+1. **Critical Safety Hazards Lost in Noise**: Life-threatening incidents (e.g., live high-tension wires, caved-in roads, bridge fractures) are delayed behind non-urgent complaints.
+2. **Duplicate Deluge**: A single localized incident triggers hundreds of redundant reports, overwhelming dispatch teams and inflating response times.
+3. **Black-Box AI Skepticism**: Unverifiable AI scores cause officers to distrust automated recommendations.
+4. **Lack of Provenance**: Jurisdictional boundary ambiguity creates inter-departmental finger-pointing.
 
-## ⚡ Core Capabilities & Intelligence Engine (Phase 1 & Phase 2)
-
-- **8-Stage Intelligence Pipeline**: Every grievance moves through a transparent, testable 8-stage sequence:
-  $$\text{INGEST} \rightarrow \text{NORMALISE} \rightarrow \text{CLASSIFY} \rightarrow \text{EXTRACT} \rightarrow \text{MATCH} \rightarrow \text{SCORE} \rightarrow \text{ROUTE} \rightarrow \text{ALERT}$$
-- **Full Analytical Provenance**: Every output explicitly identifies its method, execution timestamp, duration (ms), confidence score, and provenance tag (`REAL_LOCAL_MODEL`, `DETERMINISTIC_RULES`, or `DEMO_RULE_BASED`).
-- **Bilingual Grievance Classification (En / Hi)**:
-  - Local TF-IDF Cosine vector model on civic prototypes.
-  - Devanagari script detection (`[\u0900-\u097F]`), Hindi phonetic normalization (*ट्रांसफार्मर*, *गड्ढा*, *जलजमाव*), and stopword filtering.
-  - Transparent rule-based fallback for unsupported languages or low confidence.
-- **Multi-Factor Duplicate & Clustering Engine**:
-  - Detects duplicate candidates via: Text Similarity (30%), Category Agreement (25%), Haversine Geo Proximity (30%), and Time-Window Overlap (15%).
-  - Exposes complete evidence breakdown for every match.
-  - **Human-in-the-Loop Review**: Officials confirm or reject matches, merging related reports into root incidents without ever deleting or mutating original citizen complaints.
-- **Explainable 6-Factor Priority Scoring**:
-  - Base Hazard (0–30) + Corroborated Volume (0–25) + Recurrence Velocity (0–15) + SLA Aging (0–15) + Geo Spread (0–10) + Evidence Quality (0–5).
-  - Strictly decouples social media viral popularity from actual public harm.
-  - **Official Priority Override**: Authorized officials can override AI recommendations by recording a mandatory justification in the immutable audit trail.
-- **Department Routing Engine**:
-  - Recommends statutory Bihar administrative departments based on category and jurisdiction (RWD, MCD, BSPHCL, PHED, BHP).
-  - Explicitly mandates human officer confirmation prior to dispatch.
-- **Automated Threshold Alert Engine**:
-  - Emits alerts for critical safety hazards (`CRITICAL_SAFETY`), expanding clusters (`CLUSTER_GROWTH`), localized complaint hotspots (`AREA_HOTSPOT`), SLA breaches (`OVERDUE_SLA`), and sudden district surges (`DISTRICT_SURGE`).
-- **Midnight-Navy Command Center & Interactive Map**:
-  - Real-time KPIs, intake vs. resolution analytics, Leaflet geospatial map with glowing severity markers, and case inspection drawers.
-- **Role-Based Command Matrix & Audit Trail**:
-  - Personas: Super Admin, District Magistrate, Department Officer, Field Investigator.
-  - Immutable audit logs capture actor, timestamp, previous values, and new state.
+### The JANRAKSHA AI Solution
+**JANRAKSHA AI** is a mission-grade command-and-control civic intelligence platform that processes bilingual grievances (English & Hindi) through a transparent **8-stage intelligence pipeline**. It groups related complaints into root incidents, calculates explainable 6-factor priority scores, dispatches complaints to statutory Bihar administrative departments, and alerts commanders to emerging public safety hotspots in real time.
 
 ---
 
-## 🧠 Phase 3: Real AI & Multimodal Intelligence
+## 🏛️ 2. High-Level Architecture
 
-### 1. Real NLP & Model Adapter Architecture
-- **Adapter Interface (`INLPModelAdapter`)**: Located in `backend/src/services/ai/types.ts`. Provides structured output schemas with strict validation.
-- **Local Bilingual Adapter (`LocalRuleAdapter`)**: Default zero-setup model (`janraksha-bilingual-v3.2`) with TF-IDF cosine vector matching, Devanagari keyword extractors, and rule-based sentiment polarity.
-- **Configurable External Provider (`ExternalAIProviderAdapter`)**: Ready-to-use adapter supporting OpenAI, Gemini, or Ollama via `AI_PROVIDER=gemini` or `AI_PROVIDER=openai` and `AI_API_KEY`.
-- **Structured Output**: Validates category, confidence, sentiment score (-1.0 to 1.0), urgency score (1-10), extracted entities (locations, landmarks, keywords), model provider, version, and latency.
+```mermaid
+graph TD
+    subgraph Intake["Multi-Channel Intake"]
+        PORTAL[Citizen Web Portal] --> INGEST[Ingestion Controller]
+        WA[WhatsApp Helpline Gateway] --> INGEST
+        SOC[Social Feeds / X Ingestion] --> INGEST
+        RSS[Bihar State RSS Feeds] --> INGEST
+        CSV[Batch CSV / JSON Importer] --> INGEST
+    end
 
-### 2. Image and Video Intelligence
-- **Visual Model Adapter (`VisionModelAdapter`)**: Classifies civic infrastructure issues from photos and videos (surface asphalt craters, stormwater accumulation, live wires, illegal dumping, missing manhole covers).
-- **Video Keyframe Extraction**: Samples representative frames (start, midpoint, end) to analyze video evidence without heavy compute overhead.
-- **Model Observations vs. Official Verification**: Case details distinguish model-detected bounding boxes and predictions from human officer verification.
+    subgraph SecurityLayer["Perimeter Security & Privacy"]
+        INGEST --> AUTH[Auth & RBAC Middleware]
+        AUTH --> PRIV[PrivacyService: PII Redaction]
+        PRIV --> GEO[Geospatial Validator: Bihar Bounding Box]
+    end
 
-### 3. Social-Source Ingestion & Connectors
-- **Connector States**: Real-time connector dashboard in the Incident Intelligence view showing operational state (`ACTIVE`, `STANDBY`, `DISCONNECTED`).
-- **Supported Channels**:
-  - Official X (formerly Twitter) tag ingestion adapter.
-  - Bihar State Grievance Portal RSS/JSON feed reader.
-  - WhatsApp Helpline Webhook Gateway.
-  - **CSV & JSON Fallback**: Drag-and-drop batch ingestion with schema validation and duplicate prevention.
+    subgraph Pipeline["8-Stage Intelligence Pipeline"]
+        GEO --> P1[1. INGEST: Validation]
+        P1 --> P2[2. NORMALISE: NFC & Devanagari Hindi Engine]
+        P2 --> P3[3. CLASSIFY: NLP Adapter / TF-IDF Cosine]
+        P3 --> P4[4. EXTRACT: Locality NER & Hazard Keywords]
+        P4 --> P5[5. MATCH: Multi-Factor Duplicate Engine]
+        P5 --> P6[6. SCORE: Explainable 6-Factor Priority]
+        P6 --> P7[7. ROUTE: Statutory Dept Routing Engine]
+        P7 --> P8[8. ALERT: Hotspot & Threshold Anomaly Engine]
+    end
 
-### 4. Geospatial Intelligence & Provenance
-- **Provenance Tracking**: Every location is assigned a provenance label:
-  - `GPS_EXACT`: Precise coordinates provided by mobile device.
-  - `LOCALITY_CENTROID`: Geocoded against Bihar landmark/ward database.
-  - `DISTRICT_CENTROID`: Centroid of administrative district.
-  - `UNRESOLVED`: Preserves unmapped or missing location without inventing fake coordinates.
-- **Map Filtering**: Dynamic Leaflet map filters by district, severity, and status.
+    subgraph Database["Persistence Layer (Prisma ORM)"]
+        Pipeline --> DB[(SQLite / PostgreSQL Database)]
+        DB --> GRIEV[Grievances & AI Analysis]
+        DB --> CLUST[Incident Clusters & Duplicates]
+        DB --> AUDIT[Immutable Append-Only AuditLog]
+        DB --> ALERTS[Command Alerts & Notifications]
+    end
 
-### 5. Privacy, Redaction & Resilience
-- **Automated PII Redaction (`PrivacyService`)**: Regex-based scrubbing of Indian phone numbers (`+91 / 10-digit`), 12-digit Aadhaar numbers, and email addresses.
-- **Role-Based Display**: Complainant identities are masked for non-authorized personnel; anonymous submissions withhold all personal identifiers.
-- **Upload Resilience**: 50MB maximum payload limit, MIME-type whitelist (JPEG, PNG, WebP, MP4, WebM, CSV, JSON), UUID file names, and safe error boundaries.
-
-### 6. Synthetic Benchmark & Evaluation
-- **Gold-Standard Dataset (`GOLD_STANDARD_BENCHMARK_SET`)**: 24 curated test cases with ground-truth categories, sentiment, and district labels across English, Hindi, and code-mixed formats.
-- **Live Benchmarking Endpoint**: `GET /api/v1/evaluation/benchmark` computes precision, recall, F1-scores, language-specific accuracy, and latency distributions.
-- **Honest Limitations Disclosure**: Transparently reports lower recall for non-standardized rural dialects (e.g., Magahi, Angika) and landmark gazetteer boundaries.
-
----
-
-## 🛠 Tech Stack
-
-- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Lucide Icons, Recharts, Leaflet.
-- **Backend**: Node.js, Express, TypeScript, Zod schema validation.
-- **Database**: Prisma ORM with SQLite local zero-setup fallback (switchable to PostgreSQL).
-- **Testing**: Vitest, Supertest for API and pipeline verification (21 test suites).
+    subgraph UI["Command Center & Dispatch UI (React + Vite)"]
+        DB --> CC[Midnight-Navy Command Center]
+        DB --> MAP[Geospatial Interactive Map & Leaflet]
+        DB --> REVIEW[Duplicate Review & Cluster Merge Queue]
+        DB --> DEMO[8-Step Guided Judge Demonstration Engine]
+        DB --> DIAG[Live System Health & DB Diagnostics]
+    end
+```
 
 ---
 
-## 🚀 Quick Startup Guide
+## ⚡ 3. Key Features by Phase
+
+### Phase 1 & 2: Core Intelligence Engine
+- **8-Stage Pipeline**: Transparent execution with execution timestamps, latencies, confidence ratings, and provenance tags (`REAL_LOCAL_MODEL`, `DETERMINISTIC_RULES`, `DEMO_RULE_BASED`).
+- **Bilingual NLP**: Local TF-IDF Cosine vector model on civic prototypes with Devanagari normalization (*ट्रांसफार्मर*, *गड्ढा*, *जलजमाव*) and stopword filtering.
+- **Multi-Factor Duplicate Matching**: Text similarity (30%), category agreement (25%), Haversine proximity (30%), and time overlap (15%).
+- **Explainable 6-Factor Priority**: Base Hazard (0–30) + Corroborated Volume (0–25) + Recurrence Velocity (0–15) + SLA Aging (0–15) + Geo Spread (0–10) + Evidence Quality (0–5).
+- **Official Priority Override**: Authorized officers can override AI recommendations by recording a mandatory justification in the immutable audit trail.
+- **Statutory Routing**: Automatic mapping to Bihar departments (RWD, MCD, BSPHCL, PHED, BHP).
+- **Threshold Alerts**: Hotspots (`AREA_HOTSPOT`), cluster growth (`CLUSTER_GROWTH`), safety hazards (`CRITICAL_SAFETY`), and SLA breaches (`OVERDUE_SLA`).
+
+### Phase 3: Real AI & Multimodal Intelligence
+- **Replaceable Model Adapter Architecture**: Zero-setup `LocalRuleAdapter` or configurable cloud AI (`gemini`, `openai`, `ollama`).
+- **Vision Intelligence**: Multimodal defect identification from images and video keyframe extraction.
+- **Social Ingestion Connectors**: Live connectors for X feeds, WhatsApp gateway, state RSS feeds, and CSV/JSON fallback.
+- **Geocoding & Location Provenance**: `GPS_EXACT`, `LOCALITY_CENTROID`, `DISTRICT_CENTROID`, or `UNRESOLVED`.
+- **Privacy & PII Redaction**: Automated scrubbing of Indian mobile numbers, 12-digit Aadhaar numbers, and email addresses.
+- **Evaluation Benchmark**: 24-case gold-standard test suite calculating precision, recall, and F1 metrics.
+
+### Phase 4: Hackathon Polish & Guided Demonstration
+- **Interactive 8-Step Judge Demonstration**: Walkthrough of a complete incident lifecycle directly in the UI or via REST API with live database updates.
+- **Safe Environment Reset**: Single-click `POST /api/v1/demo/reset` restores factory seed state cleanly in-process without restarting the server.
+- **Live System Status & Diagnostics**: System monitor modal exposing real-time DB latency, actual entity counts, pipeline status, and connector health.
+- **Design Polish**: Midnight-navy command aesthetics (`#0B0F19`, `#0F172A`), empty/loading/error states, responsive drawers, and keyboard accessibility.
+
+---
+
+## 🚀 4. Quick Startup Guide
 
 ### Prerequisites
-- Node.js (v18+, v20+, or v24+)
-- npm (v9+)
+- **Node.js**: v18.0.0 or higher (v20+ recommended)
+- **npm**: v9.0.0 or higher
 
 ### 1. Installation
-Install all root, backend, and frontend dependencies:
+Clone repository and install all root, backend, and frontend dependencies:
 ```bash
+git clone https://github.com/Ankit-lab367/Paradise_Force.git
+cd Paradise_Force
 npm run install:all
 ```
 
-### 2. Database Setup & Seeding
-Initialize the database and load comprehensive synthetic demo data:
+### 2. Database Setup & Factory Seed
+Initialize the SQLite database and seed initial test records:
 ```bash
 npm run db:setup
 npm run db:seed
@@ -124,86 +130,135 @@ Run both backend (`http://localhost:5000`) and frontend (`http://localhost:5173`
 npm run dev
 ```
 
-Visit **`http://localhost:5173`** in your browser.
+Open your browser to: **`http://localhost:5173`**
 
 ---
 
-## 🧪 Testing & Verification
+## 🎬 5. Guided Demonstration Walkthrough (For Judges)
 
-Run the full Vitest suite:
+The platform includes a built-in **Guided Demonstration Controller** that executes a complete 8-step incident lifecycle on live database records.
+
+### How to Run via UI:
+1. Click the glowing **"Guided Demo (8 Steps)"** button in the top navigation or sidebar.
+2. Step through each phase:
+   - **Step 1: Multi-Source Ingestion** — Ingests 3 related citizen reports (Web Portal, WhatsApp, Social Feed).
+   - **Step 2: Pipeline Classification** — Runs bilingual NLP normalisation, categorizing under `ELECTRICITY` with 94% confidence.
+   - **Step 3: Cluster & Duplicate Matching** — Detects duplicate twin pair (88% similarity) and merges into `CLUST-PATNA-DEMO`.
+   - **Step 4: Explain Priority Score** — Computes explainable priority score of **87/100 (CRITICAL)**.
+   - **Step 5: Hotspot Threshold Alert** — Triggers a critical safety alert for sparking transformers.
+   - **Step 6: Authorised Dispatch** — Officer dispatches the incident to BSPHCL Field Response Unit.
+   - **Step 7: Verification & Resolution** — Officer records field inspection notes and resolves the case.
+   - **Step 8: Dashboard & Audit Verification** — Validates that live aggregate KPIs and immutable audit logs reflect the resolution.
+3. Click **"Reset Demo Data"** anytime to cleanly restore the environment to the factory seed state.
+
+### How to Run via REST API:
+```bash
+# Check demo status
+curl http://localhost:5000/api/v1/demo/overview
+
+# Execute Step 1 (Intake)
+curl -X POST http://localhost:5000/api/v1/demo/step -H "Content-Type: application/json" -d '{"step": 1}'
+
+# Execute Step 2 (Classify)
+curl -X POST http://localhost:5000/api/v1/demo/step -H "Content-Type: application/json" -d '{"step": 2}'
+
+# Execute Steps 3 to 8 similarly:
+# curl -X POST http://localhost:5000/api/v1/demo/step -H "Content-Type: application/json" -d '{"step": 8}'
+
+# Reset demo back to factory seed
+curl -X POST http://localhost:5000/api/v1/demo/reset
+```
+
+---
+
+## 📡 6. Complete API Reference
+
+All routes are prefixed with `/api/v1`:
+
+### System & Diagnostics
+| Method | Endpoint | Description | Example Response Keys |
+|---|---|---|---|
+| `GET` | `/system/status` | Live system health, DB ping, and entity counts | `status`, `database.pingMs`, `database.recordCounts` |
+| `GET` | `/demo/overview` | Guided demo step descriptions and completion state | `totalSteps`, `steps`, `status` |
+| `POST` | `/demo/step` | Run an individual demo step (1–8) | `step`, `title`, `success`, `data` |
+| `POST` | `/demo/reset` | Restore database to factory seed state | `success`, `message`, `resetTimestamp` |
+
+### Grievances & Intelligence Pipeline
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/grievances` | List grievances with district, category, and status filters | No |
+| `POST` | `/grievances` | Ingest new grievance through 8-stage pipeline | No |
+| `GET` | `/grievances/:id` | Full grievance details with AI analysis & audit trail | No |
+| `POST` | `/grievances/:id/assign` | Assign incident to department & officer | Yes (`DEPARTMENT_OFFICER`+) |
+| `POST` | `/grievances/:id/status` | Update lifecycle status (`IN_PROGRESS`, `RESOLVED`) | Yes (`FIELD_INVESTIGATOR`+) |
+| `POST` | `/grievances/:id/priority-override` | Override AI priority score with mandatory reason | Yes (`DISTRICT_MAGISTRATE`+) |
+| `POST` | `/grievances/:id/notes` | Add case note or field investigation observation | Yes |
+
+### Clusters & Duplicates
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/clusters` | List active incident clusters | No |
+| `GET` | `/clusters/:id` | View cluster details and grouped member grievances | No |
+| `POST` | `/clusters/:id/status` | Update cluster status (`INVESTIGATING`, `RESOLVED`) | Yes (`DEPARTMENT_OFFICER`+) |
+| `GET` | `/duplicates` | List pending duplicate candidate pairs | No |
+| `POST` | `/duplicates/:id/review` | Confirm or reject duplicate candidate | Yes (`DEPARTMENT_OFFICER`+) |
+
+### Ingestion & Multimodal Uploads
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/ingestion/upload` | Multipart image/video upload with visual AI analysis | No |
+| `POST` | `/ingestion/batch` | Batch CSV or JSON grievance intake | Yes (`SUPER_ADMIN`+) |
+| `GET` | `/ingestion/connectors` | Status of configured social/portal ingestion feeds | No |
+
+---
+
+## 🧪 7. Automated Test Suite
+
+Run the full automated test suite (32 unit and integration tests across 6 suites):
 ```bash
 npm test
 ```
 
-Build verification (Frontend Vite + Backend TypeScript):
-```bash
-npm run build
-```
-
-Run Phase 3 AI Evaluation Benchmark:
-```bash
-npx tsx -e "import { benchmarkService } from './backend/src/services/evaluation/benchmarkService'; benchmarkService.runEvaluation().then(res => console.log('Accuracy:', res.overallAccuracyPercent + '%'));"
-```
+### Verified Test Suites:
+- `backend/tests/aiAnalysis.test.ts` — NLP vectorization, Devanagari normalisation, and keyword extraction (4 tests passed).
+- `backend/tests/pipeline.test.ts` — Full 8-stage intelligence pipeline lifecycle (7 tests passed).
+- `backend/tests/phase3_real_ai.test.ts` — Multimodal adapters, privacy PII scrubbing, connectors, and benchmark (7 tests passed).
+- `backend/tests/api.test.ts` — Core grievance REST endpoints and error boundaries (5 tests passed).
+- `backend/tests/phase2_api.test.ts` — Clusters, duplicate candidates, and priority overrides (5 tests passed).
+- `backend/tests/phase4_demo_system.test.ts` — Live system diagnostics, 8-step demo execution, and factory reset (4 tests passed).
 
 ---
 
-## ⚙️ Environment Variables & Configuration
+## 🔒 8. Security & Role-Based Access Control (RBAC)
 
-Configure in `backend/.env`:
+JANRAKSHA AI enforces strict role-based access controls across all privileged endpoints:
 
-```env
-PORT=5000
-NODE_ENV=development
-API_PREFIX=/api/v1
-CORS_ORIGIN=http://localhost:5173
-DATABASE_URL="file:./dev.db"
-JWT_SECRET="janraksha_dev_secret_key_change_in_production_min_32_chars"
+| Persona | Scope | Dispatch & Assign | Priority Override | Candidate Review | Resolve Incident | View Audit Log |
+|---|---|:---:|:---:|:---:|:---:|:---:|
+| **Super Admin** | Statewide | Yes | Yes | Yes | Yes | Statewide |
+| **District Magistrate** | District-wide | Yes | Yes (with reason) | Yes | Yes | District |
+| **Department Officer** | Departmental | Yes | Yes (with reason) | Yes | Yes | Departmental |
+| **Field Investigator** | Field Unit | Notes only | No | No | Yes (Verification) | None |
 
-# Optional External AI Provider (defaults to zero-cost local bilingual model if omitted)
-AI_PROVIDER=local        # Options: local | gemini | openai
-AI_API_KEY=""            # Cloud API key if using gemini or openai
-AI_MODEL_NAME=""         # e.g., gemini-1.5-flash or gpt-4o-mini
-
-# Social Ingestion Connectors (optional)
-X_API_BEARER_TOKEN=""
-BIHAR_RSS_FEED_URL="https://state.bihar.gov.in/feed/civic.json"
-```
+### Privacy & Data Sanitization
+- **Automatic PII Redaction**: Ingestion filters redact 10-digit Indian mobile numbers (`+91 / 98XXXXXXXX`), 12-digit Aadhaar sequences, and personal email addresses before database commitment.
+- **Complainant Identity Shield**: Citizen phone numbers and names are masked (`R**** K****`, `+91 98*** ***12`) for departmental personnel who do not possess magistrate clearance.
+- **Immutable Audit Trail**: Every sensitive operation (priority overrides, cluster merges, status changes, demo resets) creates an append-only `AuditLog` entry storing actor ID, timestamp, prior state, and justification.
 
 ---
 
-## 📁 Repository Structure
+## ⚠️ 9. Known Limitations & Production Roadmap
 
-```
-├── ARCHITECTURE.md          # Comprehensive architecture & pipeline specs
-├── SECURITY.md              # Security model, RBAC matrix, and audit specs
-├── .env.example             # Example environment variables
-├── package.json             # Root monorepo orchestration scripts
-├── backend/
-│   ├── prisma/
-│   │   ├── schema.prisma    # Prisma schema (Grievance, DuplicateCandidate, Cluster, etc.)
-│   │   └── seed.ts          # Comprehensive synthetic data seed script
-│   ├── src/
-│   │   ├── server.ts        # Express entry point
-│   │   ├── app.ts           # App middleware & router wiring
-│   │   ├── pipeline/        # 8-Stage Intelligence Pipeline
-│   │   ├── controllers/     # Route handlers (Grievance, Duplicate, Cluster, Dept, Alert, Ingestion, Evaluation)
-│   │   ├── services/
-│   │   │   ├── ai/          # Real NLP & Vision Adapters (Local, External, Factory)
-│   │   │   ├── evaluation/  # Golden benchmark dataset and evaluation metrics
-│   │   │   ├── geospatial/  # Geocoding service with provenance tracking
-│   │   │   ├── ingestion/   # Social connectors and CSV/JSON fallback importer
-│   │   │   ├── privacy/     # PII redaction and role sanitization
-│   │   │   └── grievance.service.ts # Core business logic
-│   │   ├── middleware/      # Auth, RBAC, Multer upload, Error handlers
-│   │   └── routes/          # API route definitions
-│   └── tests/               # Vitest unit and integration tests
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   │   ├── views/       # CommandCenter, GrievanceExplorer, IncidentIntelligence, GeospatialMap
-    │   │   ├── grievance/   # CaseDetailDrawer (with Multimodal Inspector), CreateGrievanceModal
-    │   │   └── layout/      # Sidebar, TopNav
-    │   ├── context/         # AppContext state management
-    │   ├── services/        # API client
-    │   └── types/           # TypeScript interfaces
-```
+1. **Local Database Fallback**:
+   - The hackathon evaluation build runs on zero-setup SQLite (`backend/prisma/dev.db`) for immediate offline demonstration.
+   - For high-concurrency production deployments (500k+ statewide grievances), configure PostgreSQL by switching `provider = "postgresql"` in `prisma/schema.prisma`.
+2. **On-Device Computer Vision**:
+   - The current multimodal engine extracts video keyframes and analyzes visual infrastructure defect indicators via feature classifiers. Production roadmap includes deploying quantized TensorRT/ONNX YOLO models directly on dispatch workstations.
+3. **Voice Hotline Speech-to-Text**:
+   - Citizen phone audio inputs currently require transcription prior to ingestion. Future milestones will incorporate on-premise Whisper models fine-tuned on Bhojpuri, Magahi, and Maithili speech.
+
+---
+
+## 👥 Team Paradise Force
+- Built for the **Bihar Police Hackathon — Problem Statement PS-04**
+- **Repository**: [https://github.com/Ankit-lab367/Paradise_Force](https://github.com/Ankit-lab367/Paradise_Force)

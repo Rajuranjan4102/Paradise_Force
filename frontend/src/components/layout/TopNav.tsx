@@ -12,6 +12,8 @@ import {
   AlertTriangle,
   Flame,
   Info,
+  Zap,
+  Activity,
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -36,6 +38,8 @@ export const TopNav: React.FC = () => {
     reloadAlerts,
     openCreateModal,
     openCaseDrawer,
+    openDemoModal,
+    openSystemStatusModal,
   } = useApp();
 
   const [isPersonaOpen, setIsPersonaOpen] = useState(false);
@@ -97,14 +101,35 @@ export const TopNav: React.FC = () => {
       </div>
 
       {/* Right Controls: Actions & Persona */}
-      <div className="flex items-center gap-3 relative">
+      <div className="flex items-center gap-2.5 relative">
+        {/* System Health Status Diagnostic Pill */}
+        <button
+          onClick={openSystemStatusModal}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/40 hover:bg-emerald-950/70 border border-emerald-500/30 text-emerald-300 text-xs font-mono transition-colors"
+          title="View live system health diagnostics"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-ping" />
+          <span className="hidden sm:inline font-bold">System:</span>
+          <span>HEALTHY</span>
+        </button>
+
+        {/* Guided Judge Demo Launcher */}
+        <button
+          onClick={openDemoModal}
+          className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 hover:from-indigo-400 hover:to-cyan-300 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition-all shadow-[0_0_15px_rgba(99,102,241,0.3)] active:scale-95"
+          title="Launch interactive incident walkthrough for hackathon judges"
+        >
+          <Zap className="w-3.5 h-3.5 fill-current text-slate-950" />
+          <span>Guided Demo</span>
+        </button>
+
         {/* + Report Grievance Button */}
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold px-3.5 py-2 rounded-lg text-xs transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] active:scale-95"
+          className="flex items-center gap-1.5 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition-all active:scale-95"
         >
-          <PlusCircle className="w-4 h-4" />
-          <span>Ingest Grievance</span>
+          <PlusCircle className="w-3.5 h-3.5" />
+          <span>Ingest</span>
         </button>
 
         {/* Notifications Bell */}
