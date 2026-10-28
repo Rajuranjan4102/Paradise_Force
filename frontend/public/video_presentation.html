@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JANRAKSHA — Official Video Walkthrough & Voiceover Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F8F6F1;
+      --card-bg: #FFFFFF;
+      --border: #E5DFD3;
+      --text-main: #1C1917;
+      --text-muted: #78716C;
+      --accent: #292524;
+      --crimson: #9F1239;
+      --amber: #B45309;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--bg);
+      background-image: 
+        linear-gradient(to right, rgba(140, 125, 105, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(140, 125, 105, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Header */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-badge {
+      background: #1C1917;
+      color: #FFF;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn {
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+      color: var(--text-main);
+    }
+    .btn:hover {
+      background: #F5F2EB;
+    }
+    .btn-primary {
+      background: #1C1917;
+      color: #FFFFFF;
+      border-color: #1C1917;
+    }
+    .btn-primary:hover {
+      background: #292524;
+    }
+    /* Main Layout */
+    main {
+      flex: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 20px 24px 30px;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+    }
+    /* Video / Viewport Container */
+    .viewport-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(60, 50, 40, 0.05);
+    }
+    .viewport-header {
+      background: #FAF7F2;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .rec-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--crimson);
+    }
+    .rec-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #E11D48;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+    }
+    .iframe-wrapper {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      background: #F8F6F1;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    /* Hotspot Spotlight */
+    .spotlight-overlay {
+      position: absolute;
+      pointer-events: none;
+      inset: 0;
+      border: 3px solid rgba(180, 83, 9, 0.6);
+      box-shadow: inset 0 0 40px rgba(180, 83, 9, 0.1);
+      border-radius: 12px;
+      display: none;
+      transition: all 0.3s ease;
+    }
+    /* Voiceover Subtitle Bar */
+    .voiceover-bar {
+      background: #1C1917;
+      color: #FFFFFF;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .voiceover-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #A8A29E;
+    }
+    .current-chapter-pill {
+      background: rgba(255, 255, 255, 0.15);
+      color: #F5F2EB;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .voiceover-text {
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 500;
+      color: #F5F2EB;
+      min-height: 44px;
+    }
+    /* Video Controls */
+    .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .scrubber-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      position: relative;
+      cursor: pointer;
+    }
+    .scrubber-fill {
+      height: 100%;
+      background: #D97706;
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.2s linear;
+    }
+    /* Sidebar / Chapters */
+    .chapters-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(60, 50, 40, 0.05);
+    }
+    .chapters-header {
+      padding: 16px;
+      background: #FAF7F2;
+      border-bottom: 1px solid var(--border);
+    }
+    .chapters-header h3 {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .chapters-header p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .chapters-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .chapter-item {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .chapter-item:hover {
+      background: #FAF7F2;
+      border-color: var(--border);
+    }
+    .chapter-item.active {
+      background: #F4EFE6;
+      border-color: #D5CCA7;
+    }
+    .chap-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 1px;
+    }
+    .chapter-item.active .chap-num {
+      background: #1C1917;
+      color: #FFF;
+      border-color: #1C1917;
+    }
+    .chap-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .chap-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+    .chap-time {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--amber);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    /* Guide Box */
+    .guide-box {
+      margin: 12px;
+      padding: 12px;
+      background: #FAF7F2;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .guide-box strong {
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header>
+    <div class="brand-wrap">
+      <span class="brand-badge">DISPATCH COMMAND</span>
+      <div>
+        <div class="brand-title">JANRAKSHA — Bihar Public Grievance Dispatch System</div>
+        <div class="brand-sub">Submission Video Walkthrough & Broadcast-Ready Voiceover Suite</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="btnVoiceToggle" class="btn">
+        <span id="voiceIcon">🔊</span>
+        <span id="voiceStatus">Voiceover: ON</span>
+      </button>
+      <button id="btnPlayPause" class="btn btn-primary">
+        <span id="playIcon">▶</span>
+        <span id="playStatus">Play Walkthrough</span>
+      </button>
+      <button id="btnFullscreen" class="btn" title="Toggle full-screen presentation">
+        ⛶ Fullscreen
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Viewport + Chapters -->
+  <main>
+    <!-- Left: Live Video Frame & Voiceover Subtitles -->
+    <div class="viewport-card">
+      <div class="viewport-header">
+        <div class="rec-indicator">
+          <span class="rec-dot"></span>
+          <span>PRESENTATION ACTIVE • 1080P HD</span>
+        </div>
+        <span id="timestampDisplay" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted);">
+          00:00 / 03:30
+        </span>
+      </div>
+
+      <!-- Live App Iframe -->
+      <div class="iframe-wrapper">
+        <iframe id="appFrame" src="http://localhost:5173" title="JANRAKSHA Application Live Frame"></iframe>
+        <div id="spotlight" class="spotlight-overlay"></div>
+      </div>
+
+      <!-- Spoken Voiceover Narration Bar -->
+      <div class="voiceover-bar">
+        <div class="voiceover-meta">
+          <span id="chapterPill" class="current-chapter-pill">CHAPTER 1: INTRODUCTION</span>
+          <span>PRESS PLAY TO START SYNCHRONIZED AUDIO</span>
+        </div>
+        <div id="voiceoverText" class="voiceover-text">
+          Welcome to JANRAKSHA — the official public grievance redressal, spatial correlation, and emergency dispatch command platform built for the Government of Bihar.
+        </div>
+        <div class="controls-row">
+          <button id="btnPrev" class="btn" style="padding: 4px 10px; font-size: 11px;">⏮ Prev</button>
+          <div id="scrubberTrack" class="scrubber-track">
+            <div id="scrubberFill" class="scrubber-fill"></div>
+          </div>
+          <button id="btnNext" class="btn" style="padding: 4px 10px; font-size: 11px;">Next ⏭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Timed Script Chapters & Recording Cue Cards -->
+    <div class="chapters-card">
+      <div class="chapters-header">
+        <h3>Feature Chapters</h3>
+        <p>Click any chapter to jump directly with synchronized voiceover narration.</p>
+      </div>
+
+      <div id="chaptersList" class="chapters-list">
+        <!-- Dynamically rendered chapters -->
+      </div>
+
+      <div class="guide-box">
+        <strong>💡 Screen Recording Tip:</strong><br>
+        To submit this video, press <code>Win + G</code> (Windows Game Bar) or use Loom/OBS, then click <strong>"Play Walkthrough"</strong>. The browser will narrate each slide aloud while navigating the real application!
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Chapter definitions with exact timing, narration script, and target hash/action
+    const CHAPTERS = [
+      {
+        id: 0,
+        title: "Executive Overview & Problem Statement",
+        short: "Introduction",
+        time: "0:00 - 0:25",
+        duration: 25,
+        script: "Welcome to JANRAKSHA — the official public grievance redressal, spatial correlation, and emergency dispatch command platform built for the Government of Bihar. In high-density districts like Patna Central and Gaya, civic disruptions often trigger dozens of simultaneous citizen reports. JANRAKSHA unifies intake, eliminates duplicate noise, and accelerates field dispatch with end-to-end accountability.",
+        route: "command"
+      },
+      {
+        id: 1,
+        title: "Civic Intelligence Command Center",
+        short: "Command Center",
+        time: "0:25 - 0:55",
+        duration: 30,
+        script: "Here in the Command Center, administrative leadership monitors real-time telemetry across all 38 districts. Six high-density metrics track active complaints, resolution velocity, and critical safety hazards. Below, the 7-day intake trajectory chart and severity breakdown immediately stratify risk, while departmental caseload graphs ensure zero bottlenecks in municipal agencies.",
+        route: "command"
+      },
+      {
+        id: 2,
+        title: "Multi-Source Ingestion & PII Scrubbing",
+        short: "Intake & Privacy",
+        time: "0:55 - 1:25",
+        duration: 30,
+        script: "Grievances enter through web portals, helpline audio, and batch connectors. Prior to storage, JANRAKSHA's security middleware scrubs sensitive citizen data — automatically masking Aadhaar IDs, mobile numbers, and emails. The intake pipeline then determines emergency severity and categorizes reports across roads, sanitation, electricity, and drainage.",
+        route: "explorer"
+      },
+      {
+        id: 3,
+        title: "Incident Intelligence & Correlation",
+        short: "Deduplication",
+        time: "1:25 - 2:00",
+        duration: 35,
+        script: "Our automated correlation engine detects concurrent complaints originating from the same disruption using multi-factor spatial proximity, temporal windows, and Devanagari bilingual semantic matching. When duplicate twins are detected, they enter the human-in-the-loop review queue, allowing officers to confirm and group reports into unified root clusters.",
+        route: "intelligence"
+      },
+      {
+        id: 4,
+        title: "Jurisdictional GIS Dispatch Grid",
+        short: "Geospatial Map",
+        time: "2:00 - 2:30",
+        duration: 30,
+        script: "The Geospatial Map provides interactive GIS situational awareness across Bihar state. Pins are rendered in our executive stone palette, with high-priority crimson pulses for critical electrical arcing or flood hazards. Selecting any marker reveals immediate locality details, linked incident twins, and direct drawer inspection.",
+        route: "map"
+      },
+      {
+        id: 5,
+        title: "Departmental Operations & SLA Enforcement",
+        short: "Department Ops",
+        time: "2:30 - 3:00",
+        duration: 30,
+        script: "In Department Operations, tasks are routed to zonal field engineers with strict SLA countdowns — such as 12 hours for critical hazards and 48 hours for standard municipal repairs. Officers must submit photographic evidence and sign off on completion before a case can be certified as resolved.",
+        route: "operations"
+      },
+      {
+        id: 6,
+        title: "Operational SOP Simulation Runner",
+        short: "SOP Simulation",
+        time: "3:00 - 3:30",
+        duration: 30,
+        script: "For training and verification, the Operational Simulation walks stakeholders through an 8-stage incident lifecycle — from initial citizen reporting and AI classification to cluster grouping, priority scoring, officer assignment, and final certification — each backed by verifiable database mutations.",
+        route: "command",
+        action: "demo"
+      },
+      {
+        id: 7,
+        title: "Enterprise Security & Immutable Audit Trails",
+        short: "Security & Governance",
+        time: "3:30 - 4:00",
+        duration: 30,
+        script: "Security is mission-critical. JANRAKSHA features strict Content Security Policies, IP rate limiting, input sanitization against injection attacks, and Role-Based Access Control. Every consequential transition is recorded in our cryptographic, tamper-evident audit trail, ensuring complete integrity for Bihar governance.",
+        route: "settings"
+      }
+    ];
+
+    let currentChapterIndex = 0;
+    let isPlaying = false;
+    let voiceEnabled = true;
+    let currentSpeech = null;
+    let timerInterval = null;
+    let secondsElapsedInChapter = 0;
+
+    const appFrame = document.getElementById('appFrame');
+    const voiceoverText = document.getElementById('voiceoverText');
+    const chapterPill = document.getElementById('chapterPill');
+    const scrubberFill = document.getElementById('scrubberFill');
+    const timestampDisplay = document.getElementById('timestampDisplay');
+    const chaptersList = document.getElementById('chaptersList');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const btnVoiceToggle = document.getElementById('btnVoiceToggle');
+    const playIcon = document.getElementById('playIcon');
+    const playStatus = document.getElementById('playStatus');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const voiceIcon = document.getElementById('voiceIcon');
+
+    // Render Chapters List
+    function renderChapters() {
+      chaptersList.innerHTML = '';
+      CHAPTERS.forEach((c, idx) => {
+        const item = document.createElement('div');
+        item.className = `chapter-item ${idx === currentChapterIndex ? 'active' : ''}`;
+        item.onclick = () => selectChapter(idx);
+        item.innerHTML = `
+          <span class="chap-num">0${idx + 1}</span>
+          <div>
+            <div class="chap-title">${c.title}</div>
+            <div class="chap-desc">${c.short}</div>
+            <div class="chap-time">${c.time}</div>
+          </div>
+        `;
+        chaptersList.appendChild(item);
+      });
+    }
+
+    // Speak Voiceover via Web Speech API
+    function speakText(text) {
+      if (!voiceEnabled || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      
+      // Select natural English voice if available
+      const voices = window.speechSynthesis.getVoices();
+      const enVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Microsoft') || v.name.includes('English')));
+      if (enVoice) {
+        utterance.voice = enVoice;
+      }
+      
+      currentSpeech = utterance;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Change Chapter
+    function selectChapter(idx) {
+      currentChapterIndex = idx;
+      secondsElapsedInChapter = 0;
+      const chapter = CHAPTERS[idx];
+
+      renderChapters();
+      chapterPill.textContent = `CHAPTER ${idx + 1}: ${chapter.short.toUpperCase()}`;
+      voiceoverText.textContent = chapter.script;
+
+      // Update Frame Screen via postMessage or hash
+      try {
+        if (appFrame.contentWindow) {
+          appFrame.contentWindow.postMessage({ type: 'NAVIGATE_SCREEN', screen: chapter.route }, '*');
+        }
+      } catch (e) {
+        console.log(e);
+      }
+
+      updateScrubber();
+
+      if (isPlaying) {
+        speakText(chapter.script);
+      }
+    }
+
+    function updateScrubber() {
+      let totalElapsed = 0;
+      for (let i = 0; i < currentChapterIndex; i++) {
+        totalElapsed += CHAPTERS[i].duration;
+      }
+      totalElapsed += secondsElapsedInChapter;
+      const totalDuration = CHAPTERS.reduce((acc, c) => acc + c.duration, 0);
+      const percent = (totalElapsed / totalDuration) * 100;
+      scrubberFill.style.width = `${percent}%`;
+
+      const m = Math.floor(totalElapsed / 60);
+      const s = totalElapsed % 60;
+      timestampDisplay.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')} / 04:00`;
+    }
+
+    function tick() {
+      if (!isPlaying) return;
+      secondsElapsedInChapter++;
+      const currentChap = CHAPTERS[currentChapterIndex];
+
+      if (secondsElapsedInChapter >= currentChap.duration) {
+        if (currentChapterIndex < CHAPTERS.length - 1) {
+          selectChapter(currentChapterIndex + 1);
+        } else {
+          pauseWalkthrough();
+          secondsElapsedInChapter = 0;
+          updateScrubber();
+        }
+      } else {
+        updateScrubber();
+      }
+    }
+
+    function playWalkthrough() {
+      isPlaying = true;
+      playIcon.textContent = '⏸';
+      playStatus.textContent = 'Pause';
+      btnPlayPause.classList.remove('btn-primary');
+      btnPlayPause.style.background = '#9F1239';
+      btnPlayPause.style.color = '#FFFFFF';
+      btnPlayPause.style.borderColor = '#9F1239';
+
+      speakText(CHAPTERS[currentChapterIndex].script);
+      clearInterval(timerInterval);
+      timerInterval = setInterval(tick, 1000);
+    }
+
+    function pauseWalkthrough() {
+      isPlaying = false;
+      playIcon.textContent = '▶';
+      playStatus.textContent = 'Play Walkthrough';
+      btnPlayPause.classList.add('btn-primary');
+      btnPlayPause.style.background = '#1C1917';
+      btnPlayPause.style.color = '#FFFFFF';
+      btnPlayPause.style.borderColor = '#1C1917';
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      clearInterval(timerInterval);
+    }
+
+    btnPlayPause.onclick = () => {
+      if (isPlaying) {
+        pauseWalkthrough();
+      } else {
+        playWalkthrough();
+      }
+    };
+
+    btnVoiceToggle.onclick = () => {
+      voiceEnabled = !voiceEnabled;
+      if (!voiceEnabled && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        voiceStatus.textContent = 'Voiceover: OFF';
+        voiceIcon.textContent = '🔇';
+      } else {
+        voiceStatus.textContent = 'Voiceover: ON';
+        voiceIcon.textContent = '🔊';
+        if (isPlaying) {
+          speakText(CHAPTERS[currentChapterIndex].script);
+        }
+      }
+    };
+
+    document.getElementById('btnPrev').onclick = () => {
+      if (currentChapterIndex > 0) {
+        selectChapter(currentChapterIndex - 1);
+      }
+    };
+
+    document.getElementById('btnNext').onclick = () => {
+      if (currentChapterIndex < CHAPTERS.length - 1) {
+        selectChapter(currentChapterIndex + 1);
+      }
+    };
+
+    document.getElementById('btnFullscreen').onclick = () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.error(err));
+      } else {
+        document.exitFullscreen().catch(err => console.error(err));
+      }
+    };
+
+    // Initialize
+    window.addEventListener('load', () => {
+      renderChapters();
+      updateScrubber();
+      // Preload voices
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.getVoices();
+      }
+    });
+  </script>
+</body>
+</html>
