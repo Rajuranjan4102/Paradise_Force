@@ -89,6 +89,32 @@ export class GuidedDemoService {
           },
         });
 
+        // Clean up any previously created demo records to ensure idempotency
+        const existingDemoGrievances = await prisma.grievance.findMany({
+          where: { trackingId: { in: ['JAN-2026-DEMO1', 'JAN-2026-DEMO2', 'JAN-2026-DEMO3'] } },
+          select: { id: true },
+        });
+        if (existingDemoGrievances.length > 0) {
+          const ids = existingDemoGrievances.map(g => g.id);
+          await prisma.duplicateCandidate.deleteMany({
+            where: {
+              OR: [
+                { sourceGrievanceId: { in: ids } },
+                { targetGrievanceId: { in: ids } },
+              ],
+            },
+          });
+          await prisma.aIAnalysis.deleteMany({
+            where: { grievanceId: { in: ids } },
+          });
+          await prisma.grievance.deleteMany({
+            where: { id: { in: ids } },
+          });
+        }
+        await prisma.incidentCluster.deleteMany({
+          where: { clusterCode: 'CLUST-PATNA-DEMO' },
+        });
+
         const elecDept = await prisma.department.findUnique({ where: { code: 'ELEC' } });
         const slaTime = new Date(Date.now() + 12 * 3600 * 1000);
 

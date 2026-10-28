@@ -47,29 +47,29 @@ export const SystemStatusModal: React.FC = () => {
   if (!isSystemStatusModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden text-slate-100"
+        className="bg-[#FCFAF7] border border-[#E5DFD3] rounded-2xl shadow-warm-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden text-stone-800"
         role="dialog"
         aria-modal="true"
         aria-labelledby="system-status-title"
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800 bg-slate-950/80 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-[#E5DFD3] bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-              <Activity className="w-5 h-5 text-emerald-400 animate-pulse" />
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-300 flex items-center justify-center text-emerald-700">
+              <Activity className="w-5 h-5 text-emerald-600 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 id="system-status-title" className="text-base font-bold text-slate-100">
+                <h2 id="system-status-title" className="text-base font-bold text-stone-900">
                   System Status & Health Diagnostics
                 </h2>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40 font-bold uppercase">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold uppercase">
                   Actual Runtime
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-stone-500 mt-0.5">
                 Live telemetry of database, NLP pipeline, Leaflet cartography, and public ingestion connectors.
               </p>
             </div>
@@ -79,7 +79,7 @@ export const SystemStatusModal: React.FC = () => {
             <button
               onClick={loadStatus}
               disabled={loading}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 hover:text-white border border-slate-700 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 text-xs text-stone-700 border border-[#E5DFD3] transition-colors shadow-xs"
               title="Refresh live system status"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -88,7 +88,7 @@ export const SystemStatusModal: React.FC = () => {
 
             <button
               onClick={closeSystemStatusModal}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg text-stone-400 hover:text-stone-800 hover:bg-stone-100 transition-colors"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />

@@ -39,14 +39,14 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#070A12] text-slate-100 overflow-hidden font-sans">
+    <div className="flex h-screen bg-[#F8F6F1] text-stone-800 overflow-hidden font-sans bg-grid-beige">
       {/* Sidebar Navigation */}
       <Sidebar />
 
       {/* Main Content Workspace */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-transparent">
         <TopNav />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-transparent">
           {renderActiveScreen()}
         </main>
       </div>

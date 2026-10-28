@@ -223,26 +223,26 @@ export const IncidentIntelligenceView: React.FC = () => {
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-100 tracking-wide flex items-center gap-2.5">
-            <Cpu className="w-5 h-5 text-cyan-400" />
-            <span>Incident Intelligence & Deduplication Command</span>
-            <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40">
-              PHASE 2 PIPELINE
+          <h1 className="text-xl font-bold text-stone-900 tracking-wide flex items-center gap-2.5">
+            <Cpu className="w-5 h-5 text-stone-700" />
+            <span>Incident Intelligence & Multi-Report Correlation</span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-stone-200 text-stone-800 border border-stone-300">
+              AUTOMATED CORRELATION ENGINE
             </span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Spatial-semantic deduplication, multi-report incident clustering, and auditable official review.
+          <p className="text-xs text-stone-500 mt-1">
+            Spatial-temporal correlation, multi-report incident clustering, and auditable official dispatch review.
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs font-semibold flex-wrap">
+        <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#E5DFD3] text-xs font-semibold flex-wrap shadow-xs">
           <button
             onClick={() => setActiveTab('clusters')}
             className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
-              activeTab === 'clusters' ? 'bg-cyan-600 text-slate-950 font-bold' : 'text-slate-400 hover:text-slate-200'
+              activeTab === 'clusters' ? 'bg-stone-900 text-white font-semibold shadow-xs' : 'text-stone-600 hover:text-stone-900'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -252,13 +252,13 @@ export const IncidentIntelligenceView: React.FC = () => {
           <button
             onClick={() => setActiveTab('reviewQueue')}
             className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 relative ${
-              activeTab === 'reviewQueue' ? 'bg-cyan-600 text-slate-950 font-bold' : 'text-slate-400 hover:text-slate-200'
+              activeTab === 'reviewQueue' ? 'bg-stone-900 text-white font-semibold shadow-xs' : 'text-stone-600 hover:text-stone-900'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span>Candidate Review Queue</span>
             {duplicateCandidates.length > 0 && (
-              <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="w-4 h-4 rounded-full bg-stone-800 text-white text-[10px] font-bold flex items-center justify-center">
                 {duplicateCandidates.length}
               </span>
             )}
@@ -267,21 +267,21 @@ export const IncidentIntelligenceView: React.FC = () => {
           <button
             onClick={() => { setActiveTab('socialIngestion'); loadPhase3Data(); }}
             className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
-              activeTab === 'socialIngestion' ? 'bg-cyan-600 text-slate-950 font-bold' : 'text-slate-400 hover:text-slate-200'
+              activeTab === 'socialIngestion' ? 'bg-stone-900 text-white font-semibold shadow-xs' : 'text-stone-600 hover:text-stone-900'
             }`}
           >
             <Globe className="w-3.5 h-3.5" />
-            <span>Social Feeds & Ingestion</span>
+            <span>Feeds & Ingestion</span>
           </button>
 
           <button
             onClick={() => { setActiveTab('evaluationBenchmark'); if (!evaluationResults) handleRunEvaluation(); }}
             className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
-              activeTab === 'evaluationBenchmark' ? 'bg-cyan-600 text-slate-950 font-bold' : 'text-slate-400 hover:text-slate-200'
+              activeTab === 'evaluationBenchmark' ? 'bg-stone-900 text-white font-semibold shadow-xs' : 'text-stone-600 hover:text-stone-900'
             }`}
           >
             <BarChart2 className="w-3.5 h-3.5" />
-            <span>AI Benchmark & Accuracy</span>
+            <span>Engine Telemetry & Benchmark</span>
           </button>
         </div>
       </div>
@@ -415,7 +415,7 @@ export const IncidentIntelligenceView: React.FC = () => {
                 <button
                   onClick={handleRunImport}
                   disabled={isImporting || (!selectedImportFile && !csvText.trim())}
-                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition-all shadow-md shadow-cyan-950/40 flex items-center gap-2 disabled:opacity-50"
+                  className="bg-stone-900 hover:bg-stone-800 text-white font-semibold px-4 py-2 rounded-lg text-xs transition-all shadow-xs flex items-center gap-2 disabled:opacity-50"
                 >
                   <Database className="w-3.5 h-3.5" />
                   <span>{isImporting ? 'Validating & Importing...' : 'Run Batch Import'}</span>
@@ -488,23 +488,23 @@ export const IncidentIntelligenceView: React.FC = () => {
           </div>
         </div>
       ) : activeTab === 'evaluationBenchmark' ? (
-        /* TAB 4: AI BENCHMARK & EVALUATION SUITE */
+        /* TAB 4: ENGINE BENCHMARK & EVALUATION SUITE */
         <div className="space-y-6 animate-in fade-in duration-150">
           <div className="command-card p-5">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
               <div>
-                <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                  <BarChart2 className="w-4 h-4 text-cyan-400" />
-                  JANRAKSHA AI — Model Evaluation & Benchmarking Suite (Phase 3)
+                <h3 className="text-sm font-bold text-stone-900 flex items-center gap-2">
+                  <BarChart2 className="w-4 h-4 text-stone-700" />
+                  Pipeline Performance Telemetry & Ground-Truth Verification
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Live verification against 24 gold-standard bilingual test cases. Measures precision, recall, and honest limitations without invented metrics.
+                <p className="text-xs text-stone-500 mt-0.5">
+                  Live verification against 24 standard bilingual test cases. Measures precision, recall, and deterministic latency.
                 </p>
               </div>
               <button
                 onClick={handleRunEvaluation}
                 disabled={isEvaluating}
-                className="bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold px-3.5 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1.5 shadow-md shadow-cyan-950/40"
+                className="bg-stone-900 hover:bg-stone-800 text-white font-semibold px-3.5 py-1.5 rounded-lg text-xs transition-colors flex items-center gap-1.5 shadow-xs"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isEvaluating ? 'animate-spin' : ''}`} />
                 <span>{isEvaluating ? 'Evaluating Model...' : 'Run Live Benchmark'}</span>
@@ -711,17 +711,17 @@ export const IncidentIntelligenceView: React.FC = () => {
                           <button
                             onClick={() => handleRejectCandidate(candidate.id)}
                             disabled={isActionLoading}
-                            className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-red-400 border border-slate-800 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                            className="px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 text-stone-700 hover:text-stone-900 border border-[#E5DFD3] text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs"
                           >
-                            <XCircle className="w-3.5 h-3.5" />
+                            <XCircle className="w-3.5 h-3.5 text-stone-500" />
                             <span>Reject Match</span>
                           </button>
                           <button
                             onClick={() => handleConfirmCandidate(candidate.id)}
                             disabled={isActionLoading}
-                            className="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 text-xs font-bold transition-all shadow-[0_0_12px_rgba(6,182,212,0.25)] flex items-center gap-1.5"
+                            className="px-3.5 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold transition-all shadow-xs flex items-center gap-1.5"
                           >
-                            <CheckCircle className="w-3.5 h-3.5" />
+                            <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
                             <span>Confirm & Merge</span>
                           </button>
                         </div>
@@ -814,24 +814,24 @@ export const IncidentIntelligenceView: React.FC = () => {
                   onClick={() => setSelectedClusterId(cluster.id)}
                   className={`command-card p-4 cursor-pointer transition-all ${
                     isSelected
-                      ? 'border-cyan-500/60 bg-slate-900/90 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
-                      : 'hover:border-slate-700'
+                      ? 'border-stone-800 bg-white shadow-warm-md'
+                      : 'hover:border-[#DDD5C5]'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-xs font-bold text-cyan-400">{cluster.clusterCode}</span>
+                    <span className="font-mono text-xs font-bold text-stone-900">{cluster.clusterCode}</span>
                     <SeverityBadge severity={cluster.severity} size="sm" />
                   </div>
 
-                  <h3 className="text-xs font-bold text-slate-200 line-clamp-1">{cluster.title}</h3>
-                  <p className="text-[11px] text-slate-400 line-clamp-2 mt-1">{cluster.description}</p>
+                  <h3 className="text-xs font-bold text-stone-900 line-clamp-1">{cluster.title}</h3>
+                  <p className="text-[11px] text-stone-500 line-clamp-2 mt-1">{cluster.description}</p>
 
-                  <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-slate-800 text-[10px] text-slate-400 font-mono">
+                  <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-[#E5DFD3] text-[10px] text-stone-500 font-mono">
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-slate-500" />
+                      <MapPin className="w-3 h-3 text-stone-400" />
                       {cluster.locality}
                     </span>
-                    <span className="text-cyan-300 font-bold bg-cyan-950 px-2 py-0.5 rounded border border-cyan-500/30">
+                    <span className="text-stone-800 font-bold bg-[#FAF7F2] px-2 py-0.5 rounded border border-[#DDD5C5]">
                       {reportCount} Reports Linked
                     </span>
                   </div>
@@ -841,14 +841,14 @@ export const IncidentIntelligenceView: React.FC = () => {
 
             {/* Merge Standalone Case into Active Cluster Card */}
             {unclusteredCases.length > 0 && activeCluster && (
-              <div className="command-card p-4 border-slate-700 space-y-2">
-                <span className="text-xs font-bold text-slate-200 block">
-                  Link Unassigned Complaint to {activeCluster.clusterCode}
+              <div className="command-card p-4 space-y-2">
+                <span className="text-xs font-bold text-stone-900 block">
+                  Link Standalone Complaint to {activeCluster.clusterCode}
                 </span>
                 <select
                   value={selectedCaseToMerge}
                   onChange={e => setSelectedCaseToMerge(e.target.value)}
-                  className="w-full bg-slate-950 text-slate-200 text-xs rounded-lg p-2 border border-slate-800 font-medium"
+                  className="w-full bg-[#FAF7F2] text-stone-800 text-xs rounded-lg p-2 border border-[#E5DFD3] font-medium focus:outline-none focus:border-stone-500"
                 >
                   <option value="">Select Standalone Case...</option>
                   {unclusteredCases.map(uc => (
@@ -860,7 +860,7 @@ export const IncidentIntelligenceView: React.FC = () => {
                 <button
                   onClick={handleMergeCase}
                   disabled={!selectedCaseToMerge || isActionLoading}
-                  className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-cyan-400 font-bold py-1.5 rounded-lg text-xs transition-colors flex items-center justify-center gap-1"
+                  className="w-full bg-stone-900 hover:bg-stone-800 disabled:opacity-50 text-white font-semibold py-1.5 rounded-lg text-xs transition-colors flex items-center justify-center gap-1 shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Merge into Active Cluster</span>
@@ -877,14 +877,14 @@ export const IncidentIntelligenceView: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-mono text-xs font-bold text-cyan-400 bg-cyan-950 px-2.5 py-1 rounded border border-cyan-500/30">
+                      <span className="font-mono text-xs font-bold text-stone-900 bg-stone-100 px-2.5 py-1 rounded border border-stone-300">
                         {activeCluster.clusterCode}
                       </span>
                       <CategoryBadge category={activeCluster.category} />
                       <SeverityBadge severity={activeCluster.severity} />
                     </div>
-                    <h2 className="text-base font-bold text-slate-100">{activeCluster.title}</h2>
-                    <p className="text-xs text-slate-300 mt-1">{activeCluster.description}</p>
+                    <h2 className="text-base font-bold text-stone-900">{activeCluster.title}</h2>
+                    <p className="text-xs text-stone-600 mt-1">{activeCluster.description}</p>
                   </div>
 
                   {/* Status Dropdown */}

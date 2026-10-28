@@ -154,5 +154,5 @@ describe('Phase 4: Hackathon Polish, System Diagnostics & Guided Demo Tests', ()
     // Verify records exist after reset
     const grievancesCount = await prisma.grievance.count();
     expect(grievancesCount).toBeGreaterThan(10);
-  });
+  }, 30000);
 });

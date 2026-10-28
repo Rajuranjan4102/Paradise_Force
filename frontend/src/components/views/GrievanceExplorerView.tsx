@@ -64,13 +64,13 @@ export const GrievanceExplorerView: React.FC = () => {
       {/* View Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-100 tracking-wide flex items-center gap-2.5">
+          <h1 className="text-xl font-bold text-stone-900 tracking-wide flex items-center gap-2.5">
             <span>Grievance Intelligence Explorer</span>
-            <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+            <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-stone-200 text-stone-800 border border-stone-300">
               {total} Total Records
             </span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-stone-500 mt-1">
             Search, filter, and inspect detailed multi-district civic complaints and AI diagnostic telemetry.
           </p>
         </div>
@@ -81,7 +81,7 @@ export const GrievanceExplorerView: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {/* Search Input */}
           <div className="md:col-span-2 relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+            <Search className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
             <input
               type="text"
               placeholder="Search by keyword, tracking code, locality, complainant..."
@@ -90,7 +90,7 @@ export const GrievanceExplorerView: React.FC = () => {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-slate-950 text-slate-100 text-xs rounded-lg pl-9 pr-3 py-2.5 border border-slate-800 focus:outline-none focus:border-cyan-500 font-medium"
+              className="w-full bg-white text-stone-800 text-xs rounded-lg pl-9 pr-3 py-2.5 border border-[#E5DFD3] focus:outline-none focus:border-stone-500 font-medium shadow-xs"
             />
           </div>
 
@@ -102,7 +102,7 @@ export const GrievanceExplorerView: React.FC = () => {
                 setStatus(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 border border-slate-800 focus:outline-none focus:border-cyan-500 font-medium"
+              className="w-full bg-white text-stone-800 text-xs rounded-lg p-2.5 border border-[#E5DFD3] focus:outline-none focus:border-stone-500 font-medium shadow-xs"
             >
               <option value="ALL">All Statuses</option>
               <option value="OPEN">Open (Awaiting Triage)</option>
@@ -121,7 +121,7 @@ export const GrievanceExplorerView: React.FC = () => {
                 setSeverity(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 border border-slate-800 focus:outline-none focus:border-cyan-500 font-medium"
+              className="w-full bg-white text-stone-800 text-xs rounded-lg p-2.5 border border-[#E5DFD3] focus:outline-none focus:border-stone-500 font-medium shadow-xs"
             >
               <option value="ALL">All Severities</option>
               <option value="CRITICAL">Critical Hazard</option>
@@ -133,7 +133,7 @@ export const GrievanceExplorerView: React.FC = () => {
         </div>
 
         {/* Secondary Filters row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-800/80">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#E5DFD3]">
           <div>
             <select
               value={category}
@@ -141,7 +141,7 @@ export const GrievanceExplorerView: React.FC = () => {
                 setCategory(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-slate-950 text-slate-200 text-xs rounded-lg p-2 border border-slate-800 focus:outline-none focus:border-cyan-500 font-medium"
+              className="w-full bg-white text-stone-800 text-xs rounded-lg p-2 border border-[#E5DFD3] focus:outline-none focus:border-stone-500 font-medium shadow-xs"
             >
               <option value="ALL">All Categories</option>
               <option value="ROAD_DAMAGE">Road & Potholes</option>
@@ -161,7 +161,7 @@ export const GrievanceExplorerView: React.FC = () => {
                 setDistrictFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-slate-950 text-slate-200 text-xs rounded-lg p-2 border border-slate-800 focus:outline-none focus:border-cyan-500 font-medium"
+              className="w-full bg-white text-stone-800 text-xs rounded-lg p-2 border border-[#E5DFD3] focus:outline-none focus:border-stone-500 font-medium shadow-xs"
             >
               <option value="ALL">All Bihar Districts</option>
               <option value="Patna Central">Patna Central</option>
@@ -177,21 +177,21 @@ export const GrievanceExplorerView: React.FC = () => {
       {/* Grievances Table */}
       <div className="command-card overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-cyan-400 font-mono text-xs flex items-center justify-center gap-2">
+          <div className="p-12 text-center text-amber-800 font-mono text-xs flex items-center justify-center gap-2">
             <RefreshCw className="w-4 h-4 animate-spin" />
             <span>Filtering records in database...</span>
           </div>
         ) : grievances.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 text-xs space-y-2">
-            <FileText className="w-8 h-8 text-slate-600 mx-auto" />
-            <p className="font-semibold text-slate-300">No grievances match your filter criteria.</p>
-            <p className="text-[11px] text-slate-500">Try adjusting your keyword query or resetting district filters.</p>
+          <div className="p-12 text-center text-stone-500 text-xs space-y-2">
+            <FileText className="w-8 h-8 text-stone-400 mx-auto" />
+            <p className="font-semibold text-stone-700">No grievances match your filter criteria.</p>
+            <p className="text-[11px] text-stone-400">Try adjusting your keyword query or resetting district filters.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-950/70 border-b border-slate-800 text-slate-400 font-mono text-[10px] uppercase">
+                <tr className="bg-[#FAF7F2] border-b border-[#E5DFD3] text-stone-600 font-mono text-[10px] uppercase">
                   <th className="py-3 px-4">Tracking Code</th>
                   <th className="py-3 px-4">Complaint Headline</th>
                   <th className="py-3 px-4">Locality & District</th>
@@ -202,23 +202,23 @@ export const GrievanceExplorerView: React.FC = () => {
                   <th className="py-3 px-4 text-right">Inspect</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-stone-200">
                 {grievances.map(g => (
                   <tr
                     key={g.id}
                     onClick={() => openCaseDrawer(g.id)}
-                    className="hover:bg-slate-800/40 cursor-pointer transition-colors group"
+                    className="hover:bg-stone-50 cursor-pointer transition-colors group"
                   >
-                    <td className="py-3.5 px-4 font-mono font-bold text-cyan-400 whitespace-nowrap">
+                    <td className="py-3.5 px-4 font-mono font-bold text-amber-800 whitespace-nowrap">
                       {g.trackingId}
                     </td>
                     <td className="py-3.5 px-4 max-w-sm">
-                      <div className="font-semibold text-slate-200 truncate">{g.title}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5 truncate">{g.description}</div>
+                      <div className="font-semibold text-stone-900 truncate">{g.title}</div>
+                      <div className="text-[10px] text-stone-500 mt-0.5 truncate">{g.description}</div>
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
-                      <div className="font-medium text-slate-300">{g.location?.locality || 'Not specified'}</div>
-                      <div className="text-[10px] text-slate-500">{g.location?.district || ''}</div>
+                      <div className="font-medium text-stone-700">{g.location?.locality || 'Not specified'}</div>
+                      <div className="text-[10px] text-stone-400">{g.location?.district || ''}</div>
                     </td>
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <CategoryBadge category={g.category} />
@@ -229,7 +229,7 @@ export const GrievanceExplorerView: React.FC = () => {
                     <td className="py-3.5 px-4 whitespace-nowrap">
                       <StatusBadge status={g.status} size="sm" />
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap font-mono text-[11px] text-slate-300">
+                    <td className="py-3.5 px-4 whitespace-nowrap font-mono text-[11px] text-stone-700">
                       {g.department?.code || 'UNASSIGNED'}
                     </td>
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
@@ -238,7 +238,7 @@ export const GrievanceExplorerView: React.FC = () => {
                           e.stopPropagation();
                           openCaseDrawer(g.id);
                         }}
-                        className="px-3 py-1 rounded bg-slate-800 group-hover:bg-cyan-600 text-slate-300 group-hover:text-slate-950 font-bold text-[10px] transition-all flex items-center gap-1 ml-auto"
+                        className="px-3 py-1 rounded bg-stone-100 group-hover:bg-stone-900 text-stone-700 group-hover:text-white font-bold text-[10px] transition-all flex items-center gap-1 ml-auto shadow-xs"
                       >
                         <Eye className="w-3 h-3" />
                         <span>Inspect</span>
@@ -252,24 +252,24 @@ export const GrievanceExplorerView: React.FC = () => {
         )}
 
         {/* Pagination Bar */}
-        <div className="p-4 border-t border-slate-800/80 bg-slate-950/40 flex items-center justify-between text-xs text-slate-400">
+        <div className="p-4 border-t border-[#E5DFD3] bg-[#FAF7F2] flex items-center justify-between text-xs text-stone-600">
           <span>
-            Showing Page <span className="font-mono font-bold text-slate-200">{page}</span> of{' '}
-            <span className="font-mono font-bold text-slate-200">{totalPages}</span> ({total} cases)
+            Showing Page <span className="font-mono font-bold text-stone-900">{page}</span> of{' '}
+            <span className="font-mono font-bold text-stone-900">{totalPages}</span> ({total} cases)
           </span>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 disabled:opacity-40 text-slate-300 transition-colors"
+              className="p-1.5 rounded-lg bg-white border border-[#E5DFD3] hover:bg-stone-100 disabled:opacity-40 text-stone-700 transition-colors shadow-xs"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
-              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 disabled:opacity-40 text-slate-300 transition-colors"
+              className="p-1.5 rounded-lg bg-white border border-[#E5DFD3] hover:bg-stone-100 disabled:opacity-40 text-stone-700 transition-colors shadow-xs"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

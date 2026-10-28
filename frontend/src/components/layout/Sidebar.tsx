@@ -27,7 +27,7 @@ export const Sidebar: React.FC = () => {
   const navItems: NavItem[] = [
     { id: 'command', label: 'Command Center', icon: LayoutDashboard },
     { id: 'explorer', label: 'Grievance Explorer', icon: FileText },
-    { id: 'intelligence', label: 'Incident Intelligence', icon: Cpu, badge: 'AI' },
+    { id: 'intelligence', label: 'Incident Intelligence', icon: Cpu },
     { id: 'map', label: 'Geospatial Map', icon: Map },
     { id: 'operations', label: 'Department Ops', icon: Building2 },
     {
@@ -41,27 +41,25 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 h-screen bg-[#070A12] border-r border-slate-800/80 flex flex-col justify-between shrink-0 select-none">
+    <aside className="w-64 h-screen bg-[#F4F1EA]/95 border-r border-[#E5DFD3] flex flex-col justify-between shrink-0 select-none backdrop-blur-md">
       <div>
         {/* Brand Header */}
-        <div className="p-5 border-b border-slate-800/80 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-600 p-0.5 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-            <div className="w-full h-full bg-[#0B0F19] rounded-[10px] flex items-center justify-center">
-              <Shield className="w-5 h-5 text-cyan-400" />
-            </div>
+        <div className="p-5 border-b border-[#E5DFD3] flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-stone-900 p-0.5 shadow-xs flex items-center justify-center">
+            <Shield className="w-5 h-5 text-amber-100" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-sm tracking-wider text-white">JANRAKSHA</span>
-              <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">AI</span>
+              <span className="font-extrabold text-sm tracking-wider text-stone-900">JANRAKSHA</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-stone-200 text-stone-800 border border-stone-300">DISPATCH</span>
             </div>
-            <p className="text-[10px] text-slate-400 tracking-tight font-medium">Bihar Police Command • PS-04</p>
+            <p className="text-[10px] text-stone-500 tracking-tight font-medium">Bihar Public Grievance Command</p>
           </div>
         </div>
 
         {/* Navigation Items */}
         <nav className="p-3 space-y-1.5">
-          <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+          <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-400">
             Intelligence Modules
           </div>
           {navItems.map(item => {
@@ -71,16 +69,16 @@ export const Sidebar: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveScreen(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all duration-150 ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs transition-all duration-150 ${
                   isActive
-                    ? 'bg-gradient-to-r from-cyan-950/70 to-blue-950/40 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.15)]'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
+                    ? 'bg-[#E5DFD2] text-stone-900 font-semibold border border-[#D5CCA7] shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900 hover:bg-[#ECE6DA] border border-transparent font-medium'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon
                     className={`w-4 h-4 transition-colors ${
-                      isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'
+                      isActive ? 'text-stone-900' : 'text-stone-500 group-hover:text-stone-800'
                     }`}
                   />
                   <span>{item.label}</span>
@@ -88,7 +86,7 @@ export const Sidebar: React.FC = () => {
                 {item.badge && (
                   <span
                     className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
-                      item.badgeColor || 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                      item.badgeColor || 'bg-stone-200 text-stone-800 border border-stone-300'
                     }`}
                   >
                     {item.badge}
@@ -98,20 +96,20 @@ export const Sidebar: React.FC = () => {
             );
           })}
 
-          {/* Phase 4: Prominent Guided Judge Demo Button */}
-          <div className="pt-3 border-t border-slate-800/80">
+          {/* Operational Simulation Walkthrough Button */}
+          <div className="pt-3 border-t border-[#E5DFD3]">
             <button
               onClick={openDemoModal}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-950/80 via-purple-950/60 to-cyan-950/80 hover:from-indigo-900/90 hover:to-cyan-900/90 text-indigo-200 border border-indigo-500/40 text-xs font-bold transition-all shadow-[0_0_15px_rgba(99,102,241,0.2)] active:scale-95 group"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white border border-stone-800 text-xs font-semibold transition-all shadow-sm active:scale-95 group"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded-md bg-indigo-500/30 flex items-center justify-center text-cyan-300">
-                  <Zap className="w-3.5 h-3.5 fill-current" />
+                <div className="w-5 h-5 rounded-md bg-stone-800 flex items-center justify-center text-amber-200">
+                  <Activity className="w-3.5 h-3.5" />
                 </div>
-                <span>Guided Judge Demo</span>
+                <span>Operational Simulation</span>
               </div>
-              <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                8-STEPS
+              <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-stone-800 text-stone-300 border border-stone-700">
+                WALKTHROUGH
               </span>
             </button>
           </div>
@@ -121,19 +119,19 @@ export const Sidebar: React.FC = () => {
       {/* System Status Footnote (Clickable to open SystemStatusModal) */}
       <button
         onClick={openSystemStatusModal}
-        className="p-3.5 border-t border-slate-800/80 bg-slate-950/60 hover:bg-slate-900/80 m-2 rounded-xl border border-slate-800 transition-colors text-left group cursor-pointer"
+        className="p-3.5 border-t border-[#E5DFD3] bg-white/80 hover:bg-white m-2 rounded-xl border border-[#E5DFD3] transition-colors text-left group cursor-pointer shadow-xs"
         title="Click to view live system diagnostics"
       >
-        <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
-          <span className="flex items-center gap-1.5 group-hover:text-cyan-300 transition-colors">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        <div className="flex items-center justify-between text-[11px] text-stone-600 mb-1.5">
+          <span className="flex items-center gap-1.5 group-hover:text-stone-900 transition-colors font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             Core Dispatch
           </span>
-          <span className="text-[10px] font-mono text-emerald-400 font-bold">ONLINE</span>
+          <span className="text-[10px] font-mono text-emerald-700 font-bold">ONLINE</span>
         </div>
-        <div className="text-[10px] text-slate-500 flex items-center justify-between font-mono">
+        <div className="text-[10px] text-stone-500 flex items-center justify-between font-mono">
           <span>Diagnostics</span>
-          <span className="text-cyan-400 font-semibold group-hover:underline">VIEW STATE →</span>
+          <span className="text-amber-800 font-semibold group-hover:underline">VIEW STATE →</span>
         </div>
       </button>
     </aside>

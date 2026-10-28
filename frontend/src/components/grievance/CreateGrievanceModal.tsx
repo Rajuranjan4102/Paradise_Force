@@ -139,22 +139,22 @@ export const CreateGrievanceModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
-      <div className="bg-[#0B0F19] border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative">
+    <div className="fixed inset-0 z-50 bg-stone-900/40 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-[#FCFAF7] border border-[#E5DFD3] rounded-2xl max-w-2xl w-full p-6 shadow-warm-xl relative text-stone-800">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
+        <div className="flex items-center justify-between pb-4 border-b border-[#E5DFD3] mb-5">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center justify-center">
-              <Sparkles className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-900 border border-amber-300 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-amber-700" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-100">Ingest Citizen Grievance</h3>
-              <p className="text-xs text-slate-400">Bilingual Public Intake with Automatic AI Analysis</p>
+              <h3 className="text-base font-bold text-stone-900">Ingest Citizen Grievance</h3>
+              <p className="text-xs text-stone-500">Bilingual Public Intake with Automatic AI Analysis</p>
             </div>
           </div>
           <button
             onClick={closeCreateModal}
-            className="text-slate-400 hover:text-slate-100 p-1 rounded-lg hover:bg-slate-800"
+            className="text-stone-400 hover:text-stone-800 p-1 rounded-lg hover:bg-stone-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -377,18 +377,18 @@ export const CreateGrievanceModal: React.FC = () => {
           </div>
 
           {/* Submit Action */}
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-3">
+          <div className="pt-3 border-t border-[#E5DFD3] flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={closeCreateModal}
-              className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-200"
+              className="px-4 py-2 text-xs font-semibold text-stone-600 hover:text-stone-900"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold px-5 py-2.5 rounded-lg text-xs transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] flex items-center gap-2"
+              className="bg-stone-900 hover:bg-stone-800 text-white font-semibold px-5 py-2.5 rounded-lg text-xs transition-all shadow-xs flex items-center gap-2 active:scale-95 disabled:opacity-50"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{isSubmitting ? 'Ingesting & Analyzing...' : 'Dispatch Grievance'}</span>

@@ -284,19 +284,19 @@ export const CaseDetailDrawer: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-black/60 backdrop-blur-sm transition-opacity">
-      <div className="w-full max-w-2xl h-full bg-[#0B0F19] border-l border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
+    <div className="fixed inset-0 z-50 overflow-hidden flex justify-end bg-stone-900/40 backdrop-blur-xs transition-opacity">
+      <div className="w-full max-w-2xl h-full bg-[#FCFAF7] border-l border-[#E5DFD3] shadow-warm-xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200 text-stone-800">
         {/* Drawer Header */}
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60 sticky top-0 z-10">
+        <div className="p-5 border-b border-[#E5DFD3] flex items-center justify-between bg-white/80 sticky top-0 z-10 backdrop-blur-md">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="font-mono text-sm font-bold text-cyan-400 bg-cyan-950/60 px-2.5 py-1 rounded border border-cyan-500/30">
+            <span className="font-mono text-sm font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded border border-amber-200">
               {selectedGrievance.trackingId}
             </span>
             <SeverityBadge severity={selectedGrievance.severity} />
             <StatusBadge status={selectedGrievance.status} />
             {selectedGrievance.priorityOverridden && (
-              <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-500/40 flex items-center gap-1">
-                <SlidersHorizontal className="w-2.5 h-2.5 text-amber-400" />
+              <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                <SlidersHorizontal className="w-2.5 h-2.5 text-amber-700" />
                 OVERRIDDEN
               </span>
             )}
@@ -506,8 +506,8 @@ export const CaseDetailDrawer: React.FC = () => {
                     </div>
                   )}
 
-                  <p className="text-[10px] text-slate-400 leading-tight">
-                    {mediaAnalysis?.modelObservationsSummary || 'Analyzed via JANRAKSHA AI Vision pipeline.'}
+                  <p className="text-[10px] text-stone-500 leading-tight">
+                    {mediaAnalysis?.modelObservationsSummary || 'Analyzed via automated visual verification pipeline.'}
                   </p>
                 </div>
               </div>
@@ -1072,15 +1072,15 @@ export const CaseDetailDrawer: React.FC = () => {
 
         {/* Drawer Footer with Quick Resolve CTA */}
         {selectedGrievance.status !== 'RESOLVED' && (
-          <div className="p-4 border-t border-slate-800 bg-slate-900/80 flex items-center justify-between">
-            <span className="text-xs text-slate-400">
-              SLA Deadline: <span className="text-slate-200 font-mono">{new Date(selectedGrievance.slaDeadline).toLocaleDateString()}</span>
+          <div className="p-4 border-t border-[#E5DFD3] bg-[#FAF7F2] flex items-center justify-between">
+            <span className="text-xs text-stone-600">
+              SLA Deadline: <span className="text-stone-900 font-mono font-bold">{new Date(selectedGrievance.slaDeadline).toLocaleDateString()}</span>
             </span>
             <button
               onClick={() => setShowResolveModal(true)}
-              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center gap-1.5"
+              className="bg-stone-900 hover:bg-stone-800 text-white font-semibold px-4 py-2 rounded-lg text-xs transition-all shadow-xs flex items-center gap-1.5 active:scale-95"
             >
-              <CheckCircle className="w-4 h-4" />
+              <CheckCircle className="w-4 h-4 text-emerald-400" />
               <span>Certify & Resolve Case</span>
             </button>
           </div>

@@ -87,33 +87,33 @@ export const AdministrationSettingsView: React.FC = () => {
       {/* View Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-100 tracking-wide flex items-center gap-2.5">
-            <Settings className="w-5 h-5 text-cyan-400" />
+          <h1 className="text-xl font-bold text-stone-900 tracking-wide flex items-center gap-2.5">
+            <Settings className="w-5 h-5 text-stone-700" />
             <span>System Administration & Audit Governance</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Diagnostics, RBAC persona switching, AI engine parameters, and immutable audit trails for Bihar Police Hackathon PS-04.
+          <p className="text-xs text-stone-500 mt-1">
+            Diagnostics, RBAC persona switching, triage parameters, and immutable audit trails for Bihar Public Grievance Command.
           </p>
         </div>
 
-        {/* Phase 4 Judge Action Buttons */}
+        {/* Operational Simulation & Maintenance Actions */}
         <div className="flex items-center gap-2.5">
           <button
             onClick={openDemoModal}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-400 hover:to-cyan-400 text-slate-950 font-bold text-xs shadow-[0_0_15px_rgba(99,102,241,0.3)] active:scale-95 transition-all"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs shadow-xs active:scale-95 transition-all"
           >
-            <Zap className="w-4 h-4 fill-current" />
-            <span>Launch Guided Demo</span>
+            <Activity className="w-4 h-4 text-amber-200" />
+            <span>Operational Simulation</span>
           </button>
 
           <button
             onClick={handleResetData}
             disabled={isResetting}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition-colors"
-            title="Reset database to clean factory seed state"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-stone-100 text-stone-700 border border-[#E5DFD3] text-xs font-semibold transition-colors shadow-xs"
+            title="Reset database to clean baseline seed state"
           >
             <RotateCcw className={`w-3.5 h-3.5 ${isResetting ? 'animate-spin' : ''}`} />
-            <span>Reset Demo Data</span>
+            <span>Reset Baseline Data</span>
           </button>
         </div>
       </div>
@@ -130,13 +130,13 @@ export const AdministrationSettingsView: React.FC = () => {
         {/* Core Diagnostics */}
         <div className="command-card p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-cyan-300 uppercase tracking-wider">
-              <Database className="w-4 h-4 text-cyan-400" />
+            <div className="flex items-center gap-2 text-xs font-bold text-stone-800 uppercase tracking-wider">
+              <Database className="w-4 h-4 text-stone-700" />
               <span>Persistence & Runtime</span>
             </div>
             <button
               onClick={openSystemStatusModal}
-              className="text-[10px] text-cyan-400 hover:underline flex items-center gap-1 font-mono"
+              className="text-[10px] text-stone-700 hover:text-stone-900 hover:underline flex items-center gap-1 font-mono font-semibold"
             >
               <span>FULL DIAGNOSTICS</span>
               <ChevronRight className="w-3 h-3" />
@@ -144,45 +144,45 @@ export const AdministrationSettingsView: React.FC = () => {
           </div>
 
           <div className="space-y-2 text-xs">
-            <div className="flex justify-between p-2 rounded bg-slate-950/70 border border-slate-800">
-              <span className="text-slate-400">Database Layer:</span>
-              <span className="font-mono text-emerald-400 font-bold">
+            <div className="flex justify-between p-2 rounded-lg bg-[#FAF7F2] border border-[#E5DFD3]">
+              <span className="text-stone-500">Database Layer:</span>
+              <span className="font-mono text-stone-800 font-bold">
                 {systemStatus?.database.provider || 'SQLite (Prisma ORM)'}
               </span>
             </div>
-            <div className="flex justify-between p-2 rounded bg-slate-950/70 border border-slate-800">
-              <span className="text-slate-400">Database Ping Latency:</span>
-              <span className="font-mono text-cyan-400 font-bold">
+            <div className="flex justify-between p-2 rounded-lg bg-[#FAF7F2] border border-[#E5DFD3]">
+              <span className="text-stone-500">Database Ping Latency:</span>
+              <span className="font-mono text-stone-800 font-bold">
                 {systemStatus ? `${systemStatus.database.pingLatencyMs} ms` : '1.2 ms'}
               </span>
             </div>
-            <div className="flex justify-between p-2 rounded bg-slate-950/70 border border-slate-800">
-              <span className="text-slate-400">Total Grievances Ingested:</span>
-              <span className="font-mono text-slate-200 font-bold">
+            <div className="flex justify-between p-2 rounded-lg bg-[#FAF7F2] border border-[#E5DFD3]">
+              <span className="text-stone-500">Total Grievances Ingested:</span>
+              <span className="font-mono text-stone-900 font-bold">
                 {systemStatus?.database.records.grievances ?? '...'}
               </span>
             </div>
-            <div className="flex justify-between p-2 rounded bg-slate-950/70 border border-slate-800">
-              <span className="text-slate-400">Active Incident Clusters:</span>
-              <span className="font-mono text-indigo-400 font-bold">
+            <div className="flex justify-between p-2 rounded-lg bg-[#FAF7F2] border border-[#E5DFD3]">
+              <span className="text-stone-500">Active Incident Clusters:</span>
+              <span className="font-mono text-stone-800 font-bold">
                 {systemStatus?.database.records.incidentClusters ?? '...'}
               </span>
             </div>
           </div>
         </div>
 
-        {/* AI Engine Settings */}
+        {/* Triage & Correlation Parameters */}
         <div className="command-card p-5 space-y-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-cyan-300 uppercase tracking-wider">
-            <Cpu className="w-4 h-4 text-cyan-400" />
-            <span>AI Engine Parameters</span>
+          <div className="flex items-center gap-2 text-xs font-bold text-stone-800 uppercase tracking-wider">
+            <Cpu className="w-4 h-4 text-stone-700" />
+            <span>Triage & Correlation Parameters</span>
           </div>
 
           <div className="space-y-3 text-xs">
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-slate-400">Duplicate Similarity Threshold:</span>
-                <span className="font-mono font-bold text-cyan-400">{(duplicateThreshold * 100).toFixed(0)}%</span>
+                <span className="text-stone-500">Duplicate Similarity Threshold:</span>
+                <span className="font-mono font-bold text-stone-900">{(duplicateThreshold * 100).toFixed(0)}%</span>
               </div>
               <input
                 type="range"
@@ -191,34 +191,34 @@ export const AdministrationSettingsView: React.FC = () => {
                 step="0.05"
                 value={duplicateThreshold}
                 onChange={e => setDuplicateThreshold(parseFloat(e.target.value))}
-                className="w-full accent-cyan-400 cursor-pointer"
+                className="w-full accent-stone-800 cursor-pointer"
               />
             </div>
 
-            <div className="flex items-center justify-between p-2 rounded bg-slate-950/70 border border-slate-800">
-              <span className="text-slate-300">Bilingual Engine (English/Hindi):</span>
+            <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAF7F2] border border-[#E5DFD3]">
+              <span className="text-stone-700 font-medium">Bilingual Verification (English/Hindi):</span>
               <input
                 type="checkbox"
                 checked={bilingualEnabled}
                 onChange={e => setBilingualEnabled(e.target.checked)}
-                className="accent-cyan-400 w-4 h-4 rounded cursor-pointer"
+                className="accent-stone-800 w-4 h-4 rounded cursor-pointer"
               />
             </div>
 
-            <div className="p-2.5 rounded bg-slate-950/80 border border-slate-800/80 text-[10px] text-slate-400 leading-relaxed font-mono">
-              Model: <span className="text-cyan-400 font-bold">janraksha-bilingual-v3.2</span> (Devanagari TF-IDF Cosine Vectorizer). Zero-cost fallback active.
+            <div className="p-2.5 rounded-lg bg-[#FAF7F2] border border-[#E5DFD3] text-[10px] text-stone-600 leading-relaxed font-mono">
+              Pipeline: <span className="text-stone-900 font-bold">production-bilingual-v3.2</span> (Devanagari TF-IDF Vectorizer & Keyword Heuristics). High-throughput deterministic pipeline active.
             </div>
           </div>
         </div>
 
         {/* Persona Switcher Box */}
         <div className="command-card p-5 space-y-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-cyan-300 uppercase tracking-wider">
-            <Users className="w-4 h-4 text-cyan-400" />
+          <div className="flex items-center gap-2 text-xs font-bold text-stone-800 uppercase tracking-wider">
+            <Users className="w-4 h-4 text-stone-700" />
             <span>Active Command Persona</span>
           </div>
 
-          <p className="text-[11px] text-slate-400">
+          <p className="text-[11px] text-stone-500">
             Switch authorized roles to test role-based constraints and visibility authoritatively.
           </p>
 
@@ -229,16 +229,16 @@ export const AdministrationSettingsView: React.FC = () => {
                 onClick={() => switchPersona(p)}
                 className={`w-full text-left p-2 rounded-lg text-xs flex items-center justify-between transition-colors ${
                   activePersona?.id === p.id
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold'
-                    : 'bg-slate-950/50 hover:bg-slate-900 border border-slate-800 text-slate-300'
+                    ? 'bg-stone-200 text-stone-900 border border-stone-400 font-semibold shadow-xs'
+                    : 'bg-[#FAF7F2] hover:bg-stone-100 border border-[#E5DFD3] text-stone-700'
                 }`}
               >
                 <div>
-                  <div className="font-medium text-slate-200">{p.name}</div>
-                  <div className="text-[10px] text-slate-500 font-mono">{p.role}</div>
+                  <div className="font-semibold text-stone-900">{p.name}</div>
+                  <div className="text-[10px] text-stone-500 font-mono">{p.role}</div>
                 </div>
                 {activePersona?.id === p.id && (
-                  <span className="text-[9px] font-mono text-cyan-400 font-bold px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-500/40">
+                  <span className="text-[9px] font-mono text-stone-800 font-bold px-1.5 py-0.5 rounded bg-white border border-stone-300">
                     ACTIVE
                   </span>
                 )}
@@ -250,19 +250,19 @@ export const AdministrationSettingsView: React.FC = () => {
 
       {/* Collapsible API Explorer / Reference */}
       <div className="command-card p-5 space-y-3">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="flex items-center justify-between border-b border-[#E5DFD3] pb-3">
           <div>
-            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-              <Code className="w-4 h-4 text-indigo-400" />
-              REST API Endpoints & Hackathon Verification Interfaces
+            <h3 className="text-xs font-bold text-stone-800 uppercase tracking-wider flex items-center gap-2">
+              <Code className="w-4 h-4 text-stone-700" />
+              REST API Endpoints & Enterprise Integration Interfaces
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Verified server-side contracts for automated grading, postman testing, and pipeline telemetry.
+            <p className="text-[11px] text-stone-500 mt-0.5">
+              Verified server-side contracts for departmental systems, third-party dispatch integration, and telemetry.
             </p>
           </div>
           <button
             onClick={() => setShowApiDocs(!showApiDocs)}
-            className="text-xs text-cyan-400 hover:text-cyan-300 font-mono flex items-center gap-1"
+            className="text-xs text-stone-800 hover:text-stone-900 font-mono font-semibold flex items-center gap-1"
           >
             <span>{showApiDocs ? 'Hide Details' : 'View All Routes'}</span>
             <ChevronRight className={`w-3.5 h-3.5 transform transition-transform ${showApiDocs ? 'rotate-90' : ''}`} />
@@ -272,7 +272,7 @@ export const AdministrationSettingsView: React.FC = () => {
         {showApiDocs && (
           <div className="overflow-x-auto pt-2 animate-in fade-in">
             <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-slate-950 text-slate-400 text-[10px] uppercase">
+              <thead className="bg-[#FAF7F2] text-stone-600 text-[10px] uppercase border-b border-[#E5DFD3]">
                 <tr>
                   <th className="p-2.5">Method</th>
                   <th className="p-2.5">Endpoint</th>
@@ -280,54 +280,54 @@ export const AdministrationSettingsView: React.FC = () => {
                   <th className="p-2.5">Description</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800 text-[11px]">
-                <tr className="hover:bg-slate-900/40">
-                  <td className="p-2.5 text-emerald-400 font-bold">GET</td>
-                  <td className="p-2.5 text-slate-200">/api/v1/health</td>
-                  <td className="p-2.5 text-slate-400">Public</td>
-                  <td className="p-2.5 text-slate-300 font-sans">Heartbeat health status probe</td>
+              <tbody className="divide-y divide-stone-200 text-[11px]">
+                <tr className="hover:bg-stone-50">
+                  <td className="p-2.5 text-stone-900 font-bold">GET</td>
+                  <td className="p-2.5 text-stone-800 font-mono">/api/v1/health</td>
+                  <td className="p-2.5 text-stone-500">Public</td>
+                  <td className="p-2.5 text-stone-700 font-sans">Heartbeat health status probe</td>
                 </tr>
-                <tr className="hover:bg-slate-900/40">
-                  <td className="p-2.5 text-emerald-400 font-bold">GET</td>
-                  <td className="p-2.5 text-slate-200">/api/v1/system/status</td>
-                  <td className="p-2.5 text-slate-400">Public</td>
-                  <td className="p-2.5 text-slate-300 font-sans">Live database, model, and connector diagnostics</td>
+                <tr className="hover:bg-stone-50">
+                  <td className="p-2.5 text-stone-900 font-bold">GET</td>
+                  <td className="p-2.5 text-stone-800 font-mono">/api/v1/system/status</td>
+                  <td className="p-2.5 text-stone-500">Public</td>
+                  <td className="p-2.5 text-stone-700 font-sans">Live database, pipeline, and connector diagnostics</td>
                 </tr>
-                <tr className="hover:bg-slate-900/40">
-                  <td className="p-2.5 text-cyan-400 font-bold">POST</td>
-                  <td className="p-2.5 text-slate-200">/api/v1/demo/step</td>
-                  <td className="p-2.5 text-amber-400">Authenticated</td>
-                  <td className="p-2.5 text-slate-300 font-sans">Executes steps 1-8 of guided incident simulation</td>
+                <tr className="hover:bg-stone-50">
+                  <td className="p-2.5 text-stone-900 font-bold">POST</td>
+                  <td className="p-2.5 text-stone-800 font-mono">/api/v1/demo/step</td>
+                  <td className="p-2.5 text-amber-800">Authenticated</td>
+                  <td className="p-2.5 text-stone-700 font-sans">Executes sequential steps of incident response simulation</td>
                 </tr>
-                <tr className="hover:bg-slate-900/40">
-                  <td className="p-2.5 text-cyan-400 font-bold">POST</td>
-                  <td className="p-2.5 text-slate-200">/api/v1/demo/reset</td>
-                  <td className="p-2.5 text-amber-400">Authenticated</td>
-                  <td className="p-2.5 text-slate-300 font-sans">Safely resets database to clean seed state</td>
+                <tr className="hover:bg-stone-50">
+                  <td className="p-2.5 text-stone-900 font-bold">POST</td>
+                  <td className="p-2.5 text-stone-800 font-mono">/api/v1/demo/reset</td>
+                  <td className="p-2.5 text-amber-800">Authenticated</td>
+                  <td className="p-2.5 text-stone-700 font-sans">Safely resets database to clean baseline seed state</td>
                 </tr>
-                <tr className="hover:bg-slate-900/40">
-                  <td className="p-2.5 text-emerald-400 font-bold">GET</td>
-                  <td className="p-2.5 text-slate-200">/api/v1/evaluation/benchmark</td>
-                  <td className="p-2.5 text-amber-400">Authenticated</td>
-                  <td className="p-2.5 text-slate-300 font-sans">Evaluates 24-case gold-standard bilingual test set</td>
+                <tr className="hover:bg-stone-50">
+                  <td className="p-2.5 text-stone-900 font-bold">GET</td>
+                  <td className="p-2.5 text-stone-800 font-mono">/api/v1/evaluation/benchmark</td>
+                  <td className="p-2.5 text-amber-800">Authenticated</td>
+                  <td className="p-2.5 text-stone-700 font-sans">Evaluates 24-case gold-standard bilingual test set</td>
                 </tr>
-                <tr className="hover:bg-slate-900/40">
-                  <td className="p-2.5 text-cyan-400 font-bold">POST</td>
-                  <td className="p-2.5 text-slate-200">/api/v1/grievances</td>
-                  <td className="p-2.5 text-amber-400">Authenticated</td>
-                  <td className="p-2.5 text-slate-300 font-sans">Ingests report with PII scrubbing and AI analysis</td>
+                <tr className="hover:bg-stone-50">
+                  <td className="p-2.5 text-stone-900 font-bold">POST</td>
+                  <td className="p-2.5 text-stone-800 font-mono">/api/v1/grievances</td>
+                  <td className="p-2.5 text-amber-800">Authenticated</td>
+                  <td className="p-2.5 text-stone-700 font-sans">Ingests report with PII scrubbing and automated priority triage</td>
                 </tr>
-                <tr className="hover:bg-slate-900/40">
-                  <td className="p-2.5 text-cyan-400 font-bold">POST</td>
-                  <td className="p-2.5 text-slate-200">/api/v1/grievances/:id/media-verify</td>
-                  <td className="p-2.5 text-red-400">Officer Only</td>
-                  <td className="p-2.5 text-slate-300 font-sans">Human verification sign-off for visual evidence</td>
+                <tr className="hover:bg-stone-50">
+                  <td className="p-2.5 text-stone-900 font-bold">POST</td>
+                  <td className="p-2.5 text-stone-800 font-mono">/api/v1/grievances/:id/media-verify</td>
+                  <td className="p-2.5 text-stone-800">Officer Only</td>
+                  <td className="p-2.5 text-stone-700 font-sans">Human verification sign-off for visual evidence</td>
                 </tr>
-                <tr className="hover:bg-slate-900/40">
-                  <td className="p-2.5 text-cyan-400 font-bold">POST</td>
-                  <td className="p-2.5 text-slate-200">/api/v1/grievances/:id/priority-override</td>
-                  <td className="p-2.5 text-red-400">Admin Only</td>
-                  <td className="p-2.5 text-slate-300 font-sans">Overrides AI score with mandatory justification</td>
+                <tr className="hover:bg-stone-50">
+                  <td className="p-2.5 text-stone-900 font-bold">POST</td>
+                  <td className="p-2.5 text-stone-800 font-mono">/api/v1/grievances/:id/priority-override</td>
+                  <td className="p-2.5 text-stone-800">Admin Only</td>
+                  <td className="p-2.5 text-stone-700 font-sans">Overrides triage score with mandatory administrative justification</td>
                 </tr>
               </tbody>
             </table>
@@ -337,32 +337,32 @@ export const AdministrationSettingsView: React.FC = () => {
 
       {/* Immutable Audit Log Table */}
       <div className="command-card p-5 space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="flex items-center justify-between border-b border-[#E5DFD3] pb-3">
           <div>
-            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-              <History className="w-4 h-4 text-cyan-400" />
+            <h3 className="text-xs font-bold text-stone-800 uppercase tracking-wider flex items-center gap-2">
+              <History className="w-4 h-4 text-stone-700" />
               Immutable Audit Log Trail ({auditLogs.length} Events)
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-[11px] text-stone-500 mt-0.5">
               Cryptographically timestamped audit trail tracking every consequential state transition, assignment, and resolution.
             </p>
           </div>
-          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded border border-emerald-500/30">
+          <span className="text-[10px] font-mono text-stone-800 bg-stone-100 px-2.5 py-1 rounded border border-stone-300 font-bold">
             TAMPER EVIDENT
           </span>
         </div>
 
         {loadingLogs ? (
-          <div className="p-8 text-center text-cyan-400 font-mono text-xs flex items-center justify-center gap-2">
-            <RefreshCw className="w-4 h-4 animate-spin" />
+          <div className="p-8 text-center text-stone-500 font-mono text-xs flex items-center justify-center gap-2">
+            <RefreshCw className="w-4 h-4 animate-spin text-stone-700" />
             <span>Fetching audit entries...</span>
           </div>
         ) : auditLogs.length === 0 ? (
-          <p className="text-xs text-slate-500 py-6 text-center">No audit records logged yet.</p>
+          <p className="text-xs text-stone-500 py-6 text-center">No audit records logged yet.</p>
         ) : (
           <div className="overflow-x-auto max-h-96 overflow-y-auto">
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="sticky top-0 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 text-slate-400 font-mono text-[10px] uppercase">
+              <thead className="sticky top-0 bg-[#FAF7F2] border-b border-[#E5DFD3] text-stone-600 font-mono text-[10px] uppercase">
                 <tr>
                   <th className="py-2.5 px-3">Timestamp</th>
                   <th className="py-2.5 px-3">Action</th>
@@ -372,27 +372,27 @@ export const AdministrationSettingsView: React.FC = () => {
                   <th className="py-2.5 px-3">Mutation Record</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-mono">
+              <tbody className="divide-y divide-stone-200 font-mono">
                 {auditLogs.map(log => (
-                  <tr key={log.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="py-2.5 px-3 whitespace-nowrap text-slate-400 text-[11px]">
+                  <tr key={log.id} className="hover:bg-stone-50 transition-colors">
+                    <td className="py-2.5 px-3 whitespace-nowrap text-stone-500 text-[11px]">
                       {new Date(log.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'medium' })}
                     </td>
                     <td className="py-2.5 px-3 whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/30">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FAF7F2] text-stone-800 border border-[#DDD5C5]">
                         {log.action}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 font-semibold text-slate-200 text-xs">
+                    <td className="py-2.5 px-3 font-semibold text-stone-900 text-xs">
                       {log.actorName}
                     </td>
-                    <td className="py-2.5 px-3 text-slate-400 text-[11px]">
+                    <td className="py-2.5 px-3 text-stone-500 text-[11px]">
                       {log.actorRole}
                     </td>
-                    <td className="py-2.5 px-3 text-slate-300 text-[11px]">
+                    <td className="py-2.5 px-3 text-stone-700 text-[11px]">
                       {log.entityType} ({log.entityId.slice(0, 8)}...)
                     </td>
-                    <td className="py-2.5 px-3 text-slate-400 text-[10px] max-w-xs truncate">
+                    <td className="py-2.5 px-3 text-stone-600 text-[10px] max-w-xs truncate font-sans">
                       {log.newValues || 'State transition'}
                     </td>
                   </tr>

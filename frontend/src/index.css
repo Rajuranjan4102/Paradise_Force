@@ -4,11 +4,23 @@
 
 @layer base {
   body {
-    @apply bg-[#070A12] text-slate-100 font-sans antialiased overflow-x-hidden;
+    @apply bg-[#F8F6F1] text-stone-800 font-sans antialiased overflow-x-hidden;
+    background-color: #F8F6F1;
     background-image: 
-      radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.05) 0%, transparent 40%),
-      radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+      linear-gradient(to right, rgba(140, 125, 105, 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(140, 125, 105, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-attachment: fixed;
   }
+}
+
+/* Transparent grid utility */
+.bg-grid-beige {
+  background-color: #F8F6F1;
+  background-image: 
+    linear-gradient(to right, rgba(140, 125, 105, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(140, 125, 105, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 /* Custom scrollbars */
@@ -18,59 +30,59 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0F19;
+  background: #F3EFE6;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
+  background: #D8D1C3;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #BFB7A6;
 }
 
 /* Command Center Glass & Card styles */
 .command-card {
-  @apply bg-slate-900/70 border border-slate-800/80 backdrop-blur-md rounded-xl transition-all duration-200;
+  @apply bg-white/90 border border-[#E5DFD3] backdrop-blur-md rounded-xl transition-all duration-200 shadow-[0_2px_8px_rgba(60,50,40,0.03)];
 }
 
 .command-card:hover {
-  @apply border-slate-700/90 shadow-lg;
+  @apply border-[#D6CDBC] shadow-[0_8px_24px_rgba(60,50,40,0.07)];
 }
 
 .command-card-glow-cyan {
-  @apply border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.15)];
+  @apply border-sky-400/50 shadow-[0_4px_16px_rgba(2,132,199,0.12)] bg-white;
 }
 
 .command-card-glow-red {
-  @apply border-red-500/40 shadow-[0_0_25px_rgba(239,68,68,0.2)];
+  @apply border-rose-400/50 shadow-[0_4px_16px_rgba(225,29,72,0.12)] bg-white;
 }
 
 .command-card-glow-amber {
-  @apply border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.15)];
+  @apply border-amber-400/50 shadow-[0_4px_16px_rgba(217,119,6,0.12)] bg-white;
 }
 
-/* Leaflet Dark Map Tile Inversion & Popups */
+/* Leaflet Map Styling for Light Aesthetic */
 .leaflet-container {
-  background-color: #0B0F19 !important;
+  background-color: #F5F1E9 !important;
   font-family: inherit !important;
 }
 
 .dark-tiles .leaflet-tile {
-  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+  filter: contrast(1.02) saturate(0.95);
 }
 
 .leaflet-popup-content-wrapper {
-  background-color: #0F172A !important;
-  color: #F8FAFC !important;
-  border: 1px solid #334155 !important;
+  background-color: #FFFFFF !important;
+  color: #1C1917 !important;
+  border: 1px solid #E5DFD3 !important;
   border-radius: 0.75rem !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7) !important;
+  box-shadow: 0 10px 25px -5px rgba(60, 50, 40, 0.15) !important;
 }
 
 .leaflet-popup-tip {
-  background-color: #0F172A !important;
+  background-color: #FFFFFF !important;
 }
 
 /* Pulse animation for critical badges */
@@ -88,3 +100,222 @@
 .pulse-critical {
   animation: criticalPulse 2s infinite ease-in-out;
 }
+
+/* ==========================================================================
+   Light Beige Aesthetic & Component Styling Overrides
+   ========================================================================== */
+
+/* Dark hardcoded background mappings */
+.bg-\[\#070A12\] {
+  background-color: #F8F6F1 !important;
+}
+
+.bg-\[\#0B0F19\],
+.bg-\[\#0B0F19\]\/90,
+.bg-\[\#0B0F19\]\/80,
+.bg-\[\#0F172A\],
+.bg-\[\#0E1626\],
+.bg-\[\#141E34\] {
+  background-color: #FCFAF7 !important;
+}
+
+/* Slate background surfaces in light beige */
+.bg-slate-950,
+.bg-slate-950\/90,
+.bg-slate-950\/80,
+.bg-slate-950\/70,
+.bg-slate-950\/60,
+.bg-slate-950\/50,
+.bg-slate-950\/40 {
+  background-color: #FAF7F2 !important;
+}
+
+.bg-slate-900,
+.bg-slate-900\/95,
+.bg-slate-900\/90,
+.bg-slate-900\/80,
+.bg-slate-900\/70,
+.bg-slate-900\/60,
+.bg-slate-900\/50,
+.bg-slate-900\/40 {
+  background-color: #FFFFFF !important;
+}
+
+.bg-slate-850 {
+  background-color: #F5F1E8 !important;
+}
+
+.bg-slate-800,
+.bg-slate-800\/90,
+.bg-slate-800\/80,
+.bg-slate-800\/70,
+.bg-slate-800\/60,
+.bg-slate-800\/50,
+.bg-slate-800\/40 {
+  background-color: #F2EDE3 !important;
+}
+
+.bg-slate-700,
+.bg-slate-700\/80 {
+  background-color: #E8E2D5 !important;
+}
+
+/* Hover background states */
+.hover\:bg-slate-900:hover,
+.hover\:bg-slate-900\/80:hover,
+.hover\:bg-slate-900\/60:hover,
+.hover\:bg-slate-900\/50:hover,
+.hover\:bg-slate-900\/40:hover,
+.hover\:bg-slate-850:hover,
+.hover\:bg-slate-800:hover,
+.hover\:bg-slate-800\/90:hover,
+.hover\:bg-slate-800\/80:hover,
+.hover\:bg-slate-800\/70:hover,
+.hover\:bg-slate-800\/60:hover,
+.hover\:bg-slate-800\/40:hover,
+.hover\:bg-slate-700:hover {
+  background-color: #F5F0E6 !important;
+}
+
+/* Architectural borders */
+.border-slate-800,
+.border-slate-800\/80,
+.border-slate-800\/60,
+.border-slate-850,
+.border-slate-700,
+.border-slate-700\/80,
+.border-slate-700\/60 {
+  border-color: #E5DFD3 !important;
+}
+
+/* Crisp typography colors */
+.text-slate-100 {
+  color: #1C1917 !important;
+}
+
+.text-slate-200 {
+  color: #292524 !important;
+}
+
+.text-slate-300,
+.text-slate-300\/90,
+.text-slate-300\/80 {
+  color: #44403C !important;
+}
+
+.text-slate-400 {
+  color: #78716C !important;
+}
+
+.text-slate-500 {
+  color: #A8A29E !important;
+}
+
+.hover\:text-slate-200:hover,
+.hover\:text-slate-100:hover {
+  color: #1C1917 !important;
+}
+
+/* Dark badge conversions to clean light tints */
+.bg-cyan-950,
+.bg-cyan-950\/80,
+.bg-cyan-950\/60,
+.bg-cyan-950\/40 {
+  background-color: #F0F9FF !important;
+  color: #0369A1 !important;
+  border-color: #BAE6FD !important;
+}
+
+.bg-emerald-950,
+.bg-emerald-950\/80,
+.bg-emerald-950\/60,
+.bg-emerald-950\/40 {
+  background-color: #ECFDF5 !important;
+  color: #047857 !important;
+  border-color: #A7F3D0 !important;
+}
+
+.bg-amber-950,
+.bg-amber-950\/80,
+.bg-amber-950\/60,
+.bg-amber-950\/40 {
+  background-color: #FFFBEB !important;
+  color: #B45309 !important;
+  border-color: #FDE68A !important;
+}
+
+.bg-red-950,
+.bg-red-950\/80,
+.bg-red-950\/60,
+.bg-red-950\/40,
+.bg-rose-950,
+.bg-rose-950\/80,
+.bg-rose-950\/60 {
+  background-color: #FFF1F2 !important;
+  color: #BE123C !important;
+  border-color: #FECDD3 !important;
+}
+
+.bg-indigo-950,
+.bg-indigo-950\/80,
+.bg-indigo-950\/60,
+.bg-purple-950,
+.bg-purple-950\/80,
+.bg-purple-950\/60 {
+  background-color: #F5F3FF !important;
+  color: #6D28D9 !important;
+  border-color: #DDD6FE !important;
+}
+
+.bg-blue-950,
+.bg-blue-950\/80,
+.bg-blue-950\/60,
+.bg-blue-950\/40 {
+  background-color: #EFF6FF !important;
+  color: #1D4ED8 !important;
+  border-color: #BFDBFE !important;
+}
+
+/* Light form controls */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  background-color: #FFFFFF !important;
+  color: #1C1917 !important;
+  border-color: #E5DFD3 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #A89C87 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(168, 156, 135, 0.2) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #A8A29E !important;
+}
+
+/* Tables in light mode */
+table thead tr {
+  background-color: #FAF7F2 !important;
+  border-color: #E5DFD3 !important;
+}
+
+table thead th {
+  color: #78716C !important;
+}
+
+table tbody tr:hover {
+  background-color: #FAF7F2 !important;
+}
+
+/* Dialogs & Modal overlays */
+.modal-surface {
+  background-color: #FCFAF7 !important;
+  border: 1px solid #E5DFD3 !important;
+  box-shadow: 0 20px 40px rgba(50, 40, 30, 0.12) !important;
+}
+

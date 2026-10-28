@@ -24,34 +24,34 @@ export const SeverityBadge: React.FC<{ severity: SeverityLevel; size?: 'sm' | 'm
     case 'CRITICAL':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 font-bold uppercase tracking-wider rounded-md bg-red-950/80 text-red-400 border border-red-500/60 shadow-[0_0_12px_rgba(239,68,68,0.35)] ${
+          className={`inline-flex items-center gap-1.5 font-bold uppercase tracking-wider rounded-md bg-[#FFF1F2] text-[#9F1239] border border-[#FECDD3] shadow-xs ${
             isSm ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
           }`}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping inline-block" />
-          <Flame className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#E11D48] animate-ping inline-block" />
+          <Flame className={isSm ? 'w-3 h-3 text-[#BE123C]' : 'w-3.5 h-3.5 text-[#BE123C]'} />
           Critical
         </span>
       );
     case 'HIGH':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 font-semibold uppercase tracking-wider rounded-md bg-amber-950/60 text-amber-400 border border-amber-500/50 ${
+          className={`inline-flex items-center gap-1.5 font-medium uppercase tracking-wider rounded-md bg-[#FAF6F0] text-stone-800 border border-stone-300 shadow-xs ${
             isSm ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
           }`}
         >
-          <AlertTriangle className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-600 inline-block" />
           High
         </span>
       );
     case 'MEDIUM':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 font-medium uppercase tracking-wider rounded-md bg-cyan-950/60 text-cyan-400 border border-cyan-500/40 ${
+          className={`inline-flex items-center gap-1.5 font-medium uppercase tracking-wider rounded-md bg-[#F8F6F1] text-stone-700 border border-stone-200 shadow-xs ${
             isSm ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
           }`}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-stone-400 inline-block" />
           Medium
         </span>
       );
@@ -59,11 +59,11 @@ export const SeverityBadge: React.FC<{ severity: SeverityLevel; size?: 'sm' | 'm
     default:
       return (
         <span
-          className={`inline-flex items-center gap-1.5 font-medium uppercase tracking-wider rounded-md bg-slate-800 text-slate-300 border border-slate-700 ${
+          className={`inline-flex items-center gap-1.5 font-medium uppercase tracking-wider rounded-md bg-stone-50 text-stone-600 border border-stone-200 shadow-xs ${
             isSm ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
           }`}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-stone-300 inline-block" />
           Low
         </span>
       );
@@ -79,52 +79,52 @@ export const StatusBadge: React.FC<{ status: GrievanceStatus; size?: 'sm' | 'md'
     case 'OPEN':
       return (
         <span
-          className={`inline-flex items-center gap-1 font-medium rounded-full bg-slate-800/90 text-slate-300 border border-slate-700 ${
+          className={`inline-flex items-center gap-1 font-medium rounded-full bg-stone-100 text-stone-700 border border-stone-300 ${
             isSm ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs'
           }`}
         >
-          <Clock className="w-3 h-3 text-slate-400" />
+          <Clock className="w-3 h-3 text-stone-500" />
           Open
         </span>
       );
     case 'ASSIGNED':
       return (
         <span
-          className={`inline-flex items-center gap-1 font-medium rounded-full bg-blue-950/70 text-blue-300 border border-blue-500/40 ${
+          className={`inline-flex items-center gap-1 font-medium rounded-full bg-[#FAF7F2] text-stone-800 border border-stone-300 ${
             isSm ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs'
           }`}
         >
-          <UserCheck className="w-3 h-3 text-blue-400" />
+          <UserCheck className="w-3 h-3 text-stone-600" />
           Assigned
         </span>
       );
     case 'IN_PROGRESS':
       return (
         <span
-          className={`inline-flex items-center gap-1 font-medium rounded-full bg-amber-950/70 text-amber-300 border border-amber-500/40 ${
+          className={`inline-flex items-center gap-1.5 font-medium rounded-full bg-[#FAF6F0] text-stone-800 border border-stone-300 ${
             isSm ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs'
           }`}
         >
-          <Activity className="w-3 h-3 text-amber-400 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse inline-block" />
           In Progress
         </span>
       );
     case 'VERIFICATION':
       return (
         <span
-          className={`inline-flex items-center gap-1 font-medium rounded-full bg-purple-950/70 text-purple-300 border border-purple-500/40 ${
+          className={`inline-flex items-center gap-1 font-medium rounded-full bg-stone-100 text-stone-800 border border-stone-300 ${
             isSm ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs'
           }`}
         >
-          <ShieldAlert className="w-3 h-3 text-purple-400" />
+          <ShieldAlert className="w-3 h-3 text-stone-600" />
           Verification
         </span>
       );
     case 'RESOLVED':
       return (
         <span
-          className={`inline-flex items-center gap-1 font-medium rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.2)] ${
-            isSm ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs'
+          className={`inline-flex items-center gap-1.5 font-medium rounded-full bg-stone-900 text-white border border-stone-900 shadow-xs ${
+            isSm ? 'px-2.5 py-0.5 text-[11px]' : 'px-3 py-1 text-xs'
           }`}
         >
           <CheckCircle2 className="w-3 h-3 text-emerald-400" />
@@ -142,29 +142,29 @@ export const CategoryBadge: React.FC<{ category: GrievanceCategory | string }> =
   const getCategoryDetails = () => {
     switch (category) {
       case 'ROAD_DAMAGE':
-        return { label: 'Road & Potholes', icon: Construction, color: 'text-orange-400 bg-orange-950/50 border-orange-500/30' };
+        return { label: 'Road & Potholes', icon: Construction };
       case 'WATERLOGGING':
-        return { label: 'Waterlogging & Flood', icon: Droplets, color: 'text-cyan-400 bg-cyan-950/50 border-cyan-500/30' };
+        return { label: 'Waterlogging & Flood', icon: Droplets };
       case 'GARBAGE_WASTE':
-        return { label: 'Garbage & Sanitation', icon: Trash2, color: 'text-emerald-400 bg-emerald-950/50 border-emerald-500/30' };
+        return { label: 'Garbage & Sanitation', icon: Trash2 };
       case 'WATER_SUPPLY':
-        return { label: 'Water Supply Pipeline', icon: Droplets, color: 'text-blue-400 bg-blue-950/50 border-blue-500/30' };
+        return { label: 'Water Supply Pipeline', icon: Droplets };
       case 'ELECTRICITY':
-        return { label: 'Electrical Hazard', icon: Zap, color: 'text-yellow-400 bg-yellow-950/50 border-yellow-500/30' };
+        return { label: 'Electrical Hazard', icon: Zap };
       case 'PUBLIC_SAFETY':
-        return { label: 'Public Safety & Darkspots', icon: Shield, color: 'text-red-400 bg-red-950/50 border-red-500/30' };
+        return { label: 'Public Safety & Darkspots', icon: Shield };
       case 'HEALTH_SANITATION':
-        return { label: 'Health & Vector Control', icon: Activity, color: 'text-teal-400 bg-teal-950/50 border-teal-500/30' };
+        return { label: 'Health & Sanitation', icon: Activity };
       default:
-        return { label: category, icon: ShieldAlert, color: 'text-slate-300 bg-slate-800 border-slate-700' };
+        return { label: category, icon: ShieldAlert };
     }
   };
 
-  const { label, icon: Icon, color } = getCategoryDetails();
+  const { label, icon: Icon } = getCategoryDetails();
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium border ${color}`}>
-      <Icon className="w-3.5 h-3.5" />
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-medium bg-[#F4EFE6] text-stone-800 border border-[#DDD5C5]">
+      <Icon className="w-3.5 h-3.5 text-stone-600" />
       {label}
     </span>
   );

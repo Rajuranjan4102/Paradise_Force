@@ -64,7 +64,7 @@ export const GeospatialMapView: React.FC = () => {
       });
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors | JANRAKSHA AI Command',
+        attribution: '&copy; OpenStreetMap contributors | JANRAKSHA Bihar State Command',
         className: 'dark-tiles',
       }).addTo(map);
 
@@ -98,38 +98,38 @@ export const GeospatialMapView: React.FC = () => {
       const latLng = L.latLng(latitude, longitude);
       bounds.extend(latLng);
 
-      // Determine glow color
+      // Restrained executive palette: only CRITICAL has crimson alert
       const color =
         item.severity === 'CRITICAL'
-          ? '#EF4444'
+          ? '#BE123C'
           : item.severity === 'HIGH'
-          ? '#F59E0B'
+          ? '#B45309'
           : item.severity === 'MEDIUM'
-          ? '#06B6D4'
-          : '#10B981';
+          ? '#57534E'
+          : '#78716C';
 
       const customIcon = L.divIcon({
         className: 'custom-pin-marker',
         html: `
           <div style="
             position: relative;
-            width: 28px;
-            height: 28px;
-            background: #0B0F19;
+            width: 26px;
+            height: 26px;
+            background: #FFFFFF;
             border: 2px solid ${color};
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 14px ${color}80;
+            box-shadow: 0 2px 8px rgba(50, 40, 30, 0.15);
             cursor: pointer;
           ">
-            <div style="width: 10px; height: 10px; background: ${color}; border-radius: 50%;"></div>
-            ${item.severity === 'CRITICAL' ? `<div style="position: absolute; inset: -4px; border: 2px solid ${color}; border-radius: 50%; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>` : ''}
+            <div style="width: 8px; height: 8px; background: ${color}; border-radius: 50%;"></div>
+            ${item.severity === 'CRITICAL' ? `<div style="position: absolute; inset: -4px; border: 2px solid #BE123C; border-radius: 50%; animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>` : ''}
           </div>
         `,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
       });
 
       const marker = L.marker(latLng, { icon: customIcon });
@@ -137,17 +137,17 @@ export const GeospatialMapView: React.FC = () => {
       const popupHtml = `
         <div style="padding: 4px; font-family: sans-serif; min-width: 220px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-family: monospace; font-size: 11px; font-weight: bold; color: #22D3EE;">${item.trackingId}</span>
+            <span style="font-family: monospace; font-size: 11px; font-weight: bold; color: #B45309;">${item.trackingId}</span>
             <span style="font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background: ${color}20; color: ${color};">${item.severity}</span>
           </div>
-          <div style="font-size: 12px; font-weight: 600; color: #F8FAFC; margin-bottom: 4px; line-height: 1.3;">${item.title}</div>
-          <div style="font-size: 11px; color: #94A3B8; margin-bottom: 8px;">${locality}, ${district}</div>
+          <div style="font-size: 12px; font-weight: 600; color: #1C1917; margin-bottom: 4px; line-height: 1.3;">${item.title}</div>
+          <div style="font-size: 11px; color: #78716C; margin-bottom: 8px;">${locality}, ${district}</div>
           <button
             id="btn-inspect-${item.id}"
             style="
               width: 100%;
-              background: #06B6D4;
-              color: #0B0F19;
+              background: #1C1917;
+              color: #FFFFFF;
               font-size: 11px;
               font-weight: bold;
               padding: 6px;
@@ -184,16 +184,16 @@ export const GeospatialMapView: React.FC = () => {
     <div className="h-[calc(100vh-4rem)] flex flex-col relative select-none">
       {/* Top Map Filter Overlay Bar */}
       <div className="absolute top-4 left-6 right-6 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
-        <div className="flex items-center gap-2 pointer-events-auto bg-slate-900/90 border border-slate-800 backdrop-blur-md p-2 rounded-xl shadow-xl">
-          <div className="flex items-center gap-1.5 px-2 text-xs font-bold text-cyan-400">
-            <Layers className="w-4 h-4" />
+        <div className="flex items-center gap-2 pointer-events-auto bg-white/95 border border-[#E5DFD3] backdrop-blur-md p-2 rounded-xl shadow-warm-md">
+          <div className="flex items-center gap-1.5 px-2 text-xs font-bold text-stone-800">
+            <Layers className="w-4 h-4 text-stone-700" />
             <span>Map Layers</span>
           </div>
 
           <select
             value={districtFilter}
             onChange={e => setDistrictFilter(e.target.value)}
-            className="bg-slate-950 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 border border-slate-800 font-medium"
+            className="bg-[#FAF7F2] text-stone-800 text-xs rounded-lg px-2.5 py-1.5 border border-[#E5DFD3] font-medium focus:outline-none focus:border-stone-500"
           >
             <option value="ALL">All Districts</option>
             <option value="Patna Central">Patna Central</option>
@@ -206,7 +206,7 @@ export const GeospatialMapView: React.FC = () => {
           <select
             value={selectedSeverity}
             onChange={e => setSelectedSeverity(e.target.value)}
-            className="bg-slate-950 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 border border-slate-800 font-medium"
+            className="bg-[#FAF7F2] text-stone-800 text-xs rounded-lg px-2.5 py-1.5 border border-[#E5DFD3] font-medium focus:outline-none focus:border-stone-500"
           >
             <option value="ALL">All Severities</option>
             <option value="CRITICAL">Critical Pins Only</option>
@@ -218,7 +218,7 @@ export const GeospatialMapView: React.FC = () => {
           <select
             value={selectedCategory}
             onChange={e => setSelectedCategory(e.target.value)}
-            className="bg-slate-950 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 border border-slate-800 font-medium"
+            className="bg-[#FAF7F2] text-stone-800 text-xs rounded-lg px-2.5 py-1.5 border border-[#E5DFD3] font-medium focus:outline-none focus:border-stone-500"
           >
             <option value="ALL">All Categories</option>
             <option value="ROAD_DAMAGE">Roads & Potholes</option>
@@ -230,20 +230,20 @@ export const GeospatialMapView: React.FC = () => {
         </div>
 
         {/* Marker Count Pill */}
-        <div className="pointer-events-auto bg-slate-900/90 border border-slate-800 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-xl flex items-center gap-3 text-xs">
+        <div className="pointer-events-auto bg-white/95 border border-[#E5DFD3] backdrop-blur-md px-3.5 py-2 rounded-xl shadow-warm-md flex items-center gap-3 text-xs">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
-            <span className="font-mono font-bold text-slate-200">{grievances.length} Active Pins</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-stone-800" />
+            <span className="font-mono font-bold text-stone-900">{grievances.length} Active Pins</span>
           </div>
-          <span className="text-slate-600">|</span>
-          <span className="text-[11px] text-slate-400">Click marker to inspect case drawer</span>
+          <span className="text-stone-300">|</span>
+          <span className="text-[11px] text-stone-500 font-medium">Click marker to inspect case details</span>
         </div>
       </div>
 
-      {/* Synthetic Demo Disclaimer Banner */}
-      <div className="absolute bottom-4 left-6 z-20 pointer-events-auto bg-slate-900/90 border border-slate-800 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] text-slate-400 font-mono flex items-center gap-2">
-        <Info className="w-3.5 h-3.5 text-cyan-400" />
-        <span>SYNTHETIC DEMO GEO-COORDINATES (BIHAR POLICE PS-04)</span>
+      {/* Official Jurisdictional Dispatch Banner */}
+      <div className="absolute bottom-4 left-6 z-20 pointer-events-auto bg-white/95 border border-[#E5DFD3] backdrop-blur-md px-3.5 py-1.5 rounded-lg text-[10px] text-stone-600 font-mono flex items-center gap-2 shadow-xs">
+        <MapPin className="w-3.5 h-3.5 text-stone-700" />
+        <span>JURISDICTIONAL DISPATCH GRID • BIHAR STATE POLICE & MUNICIPAL COMMAND</span>
       </div>
 
       {/* Leaflet Map Div */}

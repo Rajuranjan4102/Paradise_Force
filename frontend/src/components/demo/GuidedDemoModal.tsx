@@ -19,6 +19,7 @@ import {
   RefreshCw,
   FileText,
   UserCheck,
+  Activity,
 } from 'lucide-react';
 
 const STEPS_METADATA = [
@@ -116,29 +117,29 @@ export const GuidedDemoModal: React.FC = () => {
   const activeResult = stepData[currentStep];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="bg-slate-900 border border-cyan-500/40 rounded-2xl shadow-[0_0_50px_rgba(6,182,212,0.2)] max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden text-slate-100"
+        className="bg-[#FCFAF7] border border-[#E5DFD3] rounded-2xl shadow-warm-xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden text-stone-800"
         role="dialog"
         aria-modal="true"
         aria-labelledby="guided-demo-title"
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800 bg-slate-950/80 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-[#E5DFD3] bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/30 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
-              <Zap className="w-5 h-5 text-cyan-400 animate-pulse" />
+            <div className="w-9 h-9 rounded-xl bg-stone-900 flex items-center justify-center text-amber-200">
+              <Activity className="w-5 h-5 text-amber-200" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 id="guided-demo-title" className="text-base font-bold text-slate-100">
-                  JANRAKSHA AI — Guided Incident Lifecycle Demonstration
+                <h2 id="guided-demo-title" className="text-base font-bold text-stone-900">
+                  JANRAKSHA — Operational SOP Simulation
                 </h2>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-bold uppercase">
-                  Judge Mode
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-stone-200 text-stone-800 border border-stone-300 font-bold uppercase">
+                  Protocol Runner
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-stone-500 mt-0.5">
                 8-step end-to-end incident resolution workflow with verifiable live database mutations.
               </p>
             </div>
@@ -148,8 +149,8 @@ export const GuidedDemoModal: React.FC = () => {
             <button
               onClick={handleResetData}
               disabled={isResetting || loading}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 hover:text-white border border-slate-700 transition-colors"
-              title="Safely reset database to clean factory seed data"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 text-xs text-stone-700 border border-[#E5DFD3] transition-colors shadow-xs"
+              title="Safely reset database to clean baseline seed data"
             >
               <RotateCcw className={`w-3.5 h-3.5 ${isResetting ? 'animate-spin' : ''}`} />
               <span>Reset Data</span>
@@ -157,7 +158,7 @@ export const GuidedDemoModal: React.FC = () => {
 
             <button
               onClick={closeDemoModal}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg text-stone-400 hover:text-stone-800 hover:bg-stone-100 transition-colors"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
@@ -166,9 +167,9 @@ export const GuidedDemoModal: React.FC = () => {
         </div>
 
         {/* Stepper Progress Bar */}
-        <div className="px-6 py-3 bg-slate-950/50 border-b border-slate-800/80 overflow-x-auto">
+        <div className="px-6 py-3 bg-[#FAF7F2] border-b border-[#E5DFD3] overflow-x-auto">
           <div className="flex items-center justify-between min-w-[620px] gap-2">
-            {STEPS_METADATA.map((meta, idx) => {
+            {STEPS_METADATA.map((meta) => {
               const isCompleted = completedSteps.includes(meta.step);
               const isCurrent = currentStep === meta.step;
               return (
@@ -177,19 +178,19 @@ export const GuidedDemoModal: React.FC = () => {
                   onClick={() => setCurrentStep(meta.step)}
                   className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all ${
                     isCurrent
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-bold shadow-[0_0_10px_rgba(6,182,212,0.2)]'
+                      ? 'bg-stone-900 text-white font-bold shadow-xs'
                       : isCompleted
-                      ? 'bg-slate-800/80 text-emerald-400 hover:bg-slate-800 border border-emerald-500/30'
-                      : 'bg-slate-950/40 text-slate-500 hover:text-slate-400 border border-slate-800/50'
+                      ? 'bg-stone-200 text-stone-900 border border-stone-300 font-semibold'
+                      : 'bg-white text-stone-500 hover:text-stone-800 border border-[#E5DFD3]'
                   }`}
                 >
                   <span
                     className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${
-                      isCompleted
-                        ? 'bg-emerald-500 text-slate-950'
-                        : isCurrent
-                        ? 'bg-cyan-400 text-slate-950'
-                        : 'bg-slate-800 text-slate-400'
+                      isCurrent
+                        ? 'bg-amber-400 text-stone-900'
+                        : isCompleted
+                        ? 'bg-stone-800 text-white'
+                        : 'bg-stone-200 text-stone-600'
                     }`}
                   >
                     {isCompleted ? '✓' : meta.step}
@@ -202,22 +203,22 @@ export const GuidedDemoModal: React.FC = () => {
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#FAF7F2]">
           {errorMsg && (
-            <div className="p-3 bg-red-950/40 border border-red-500/40 rounded-xl text-red-200 text-xs flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <div className="p-3 bg-[#FFF1F2] border border-[#FECDD3] rounded-xl text-[#9F1239] text-xs flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-[#E11D48] shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {/* Active Step Hero Card */}
-          <div className="p-5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-4">
+          <div className="p-5 rounded-xl bg-white border border-[#E5DFD3] space-y-4 shadow-xs">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider font-bold">
+                <span className="text-[10px] font-mono text-stone-500 uppercase tracking-wider font-bold">
                   Step {currentStep} of 8
                 </span>
-                <h3 className="text-lg font-bold text-slate-100 mt-0.5">
+                <h3 className="text-lg font-bold text-stone-900 mt-0.5">
                   {STEPS_METADATA[currentStep - 1].title}
                 </h3>
               </div>
@@ -226,12 +227,12 @@ export const GuidedDemoModal: React.FC = () => {
                 <button
                   onClick={() => handleRunStep(currentStep)}
                   disabled={loading || autoPlaying}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs shadow-[0_0_15px_rgba(6,182,212,0.3)] active:scale-95 transition-all disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs shadow-xs active:scale-95 transition-all disabled:opacity-50"
                 >
                   {loading ? (
                     <RefreshCw className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Play className="w-4 h-4 fill-current" />
+                    <Play className="w-4 h-4 fill-current text-amber-200" />
                   )}
                   <span>{completedSteps.includes(currentStep) ? 'Re-Run Step' : 'Execute Step'}</span>
                 </button>
@@ -240,7 +241,7 @@ export const GuidedDemoModal: React.FC = () => {
                   <button
                     onClick={handleAutoPlay}
                     disabled={autoPlaying || loading}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-xs font-semibold text-stone-800 border border-[#E5DFD3] transition-colors"
                     title="Auto-run remaining steps sequentially"
                   >
                     <span>Auto Play</span>
@@ -252,28 +253,28 @@ export const GuidedDemoModal: React.FC = () => {
 
             {/* Step Summary / Result */}
             {activeResult ? (
-              <div className="space-y-4 pt-2 border-t border-slate-800/80">
-                <div className="p-3.5 rounded-lg bg-cyan-950/30 border border-cyan-500/30 text-xs text-cyan-200 leading-relaxed">
-                  <span className="font-bold text-cyan-300">Live Result: </span>
+              <div className="space-y-4 pt-2 border-t border-[#E5DFD3]">
+                <div className="p-3.5 rounded-lg bg-[#F5F2EB] border border-[#DDD5C5] text-xs text-stone-800 leading-relaxed font-medium">
+                  <span className="font-bold text-stone-900">Live Result: </span>
                   {activeResult.summary}
                 </div>
 
-                <div className="p-4 rounded-lg bg-slate-900 border border-slate-800 font-mono text-xs text-slate-300 space-y-2">
-                  <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-2">
+                <div className="p-4 rounded-lg bg-[#FAF7F2] border border-[#E5DFD3] font-mono text-xs text-stone-800 space-y-2">
+                  <div className="text-[10px] text-stone-500 uppercase tracking-wider font-bold mb-2">
                     Execution Telemetry & State Changes
                   </div>
-                  <pre className="text-[11px] overflow-x-auto text-cyan-300 whitespace-pre-wrap max-h-56">
+                  <pre className="text-[11px] overflow-x-auto text-stone-800 whitespace-pre-wrap max-h-56">
                     {JSON.stringify(activeResult.details, null, 2)}
                   </pre>
                 </div>
               </div>
             ) : (
-              <div className="p-8 text-center border border-dashed border-slate-800 rounded-xl space-y-2">
-                <Cpu className="w-8 h-8 text-slate-600 mx-auto" />
-                <p className="text-xs text-slate-400 font-medium">
-                  Click <span className="text-cyan-400 font-bold">"Execute Step"</span> to run this phase against the live SQLite database.
+              <div className="p-8 text-center border border-dashed border-[#E5DFD3] rounded-xl space-y-2 bg-[#FCFAF7]">
+                <Cpu className="w-8 h-8 text-stone-400 mx-auto" />
+                <p className="text-xs text-stone-600 font-medium">
+                  Click <span className="text-stone-900 font-bold">"Execute Step"</span> to run this phase against the live SQLite database.
                 </p>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-stone-500">
                   Every step performs genuine database mutations, pipeline classifications, or audit logs.
                 </p>
               </div>
@@ -287,16 +288,16 @@ export const GuidedDemoModal: React.FC = () => {
                 closeDemoModal();
                 setActiveScreen('explorer');
               }}
-              className="p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-left transition-colors group flex items-center justify-between"
+              className="p-3 rounded-xl bg-white hover:bg-stone-50 border border-[#E5DFD3] text-left transition-colors group flex items-center justify-between shadow-xs"
             >
               <div>
-                <div className="text-xs font-semibold text-slate-200 group-hover:text-cyan-400 flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5" />
+                <div className="text-xs font-semibold text-stone-800 group-hover:text-stone-900 flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-stone-600" />
                   <span>Grievance Explorer</span>
                 </div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Inspect cases JAN-2026-DEMO1..3</div>
+                <div className="text-[10px] text-stone-500 mt-0.5">Inspect cases JAN-2026-DEMO1..3</div>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-cyan-400" />
+              <ExternalLink className="w-3.5 h-3.5 text-stone-400 group-hover:text-stone-700" />
             </button>
 
             <button
@@ -304,16 +305,16 @@ export const GuidedDemoModal: React.FC = () => {
                 closeDemoModal();
                 setActiveScreen('intelligence');
               }}
-              className="p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-left transition-colors group flex items-center justify-between"
+              className="p-3 rounded-xl bg-white hover:bg-stone-50 border border-[#E5DFD3] text-left transition-colors group flex items-center justify-between shadow-xs"
             >
               <div>
-                <div className="text-xs font-semibold text-slate-200 group-hover:text-cyan-400 flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5" />
+                <div className="text-xs font-semibold text-stone-800 group-hover:text-stone-900 flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-stone-600" />
                   <span>Incident Intelligence</span>
                 </div>
-                <div className="text-[10px] text-slate-500 mt-0.5">View CLUST-ELEC-409 & Twins</div>
+                <div className="text-[10px] text-stone-500 mt-0.5">View CLUST-ELEC-409 & Twins</div>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-cyan-400" />
+              <ExternalLink className="w-3.5 h-3.5 text-stone-400 group-hover:text-stone-700" />
             </button>
 
             <button
@@ -321,26 +322,26 @@ export const GuidedDemoModal: React.FC = () => {
                 closeDemoModal();
                 setActiveScreen('map');
               }}
-              className="p-3 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-left transition-colors group flex items-center justify-between"
+              className="p-3 rounded-xl bg-white hover:bg-stone-50 border border-[#E5DFD3] text-left transition-colors group flex items-center justify-between shadow-xs"
             >
               <div>
-                <div className="text-xs font-semibold text-slate-200 group-hover:text-cyan-400 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5" />
+                <div className="text-xs font-semibold text-stone-800 group-hover:text-stone-900 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-stone-600" />
                   <span>Geospatial Map</span>
                 </div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Fraser Road / Dak Bungalow Pin</div>
+                <div className="text-[10px] text-stone-500 mt-0.5">Fraser Road / Dak Bungalow Pin</div>
               </div>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-cyan-400" />
+              <ExternalLink className="w-3.5 h-3.5 text-stone-400 group-hover:text-stone-700" />
             </button>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-slate-800 bg-slate-950/90 flex items-center justify-between text-xs text-slate-400">
+        <div className="px-6 py-3.5 border-t border-[#E5DFD3] bg-white flex items-center justify-between text-xs text-stone-500">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-ping" />
-              <span className="font-mono text-emerald-400 font-bold">LIVE ENVIRONMENT</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block animate-pulse" />
+              <span className="font-mono text-stone-800 font-bold">LIVE STATE</span>
             </span>
             <span>•</span>
             <span>All mutations recorded in immutable audit logs.</span>
@@ -350,14 +351,14 @@ export const GuidedDemoModal: React.FC = () => {
             <button
               onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
               disabled={currentStep === 1}
-              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 text-xs transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 disabled:opacity-40 text-stone-700 text-xs transition-colors font-medium"
             >
               Previous
             </button>
             <button
               onClick={() => setCurrentStep(prev => Math.min(8, prev + 1))}
               disabled={currentStep === 8}
-              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 text-xs transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 disabled:opacity-40 text-white text-xs transition-colors font-medium"
             >
               Next Step
             </button>
