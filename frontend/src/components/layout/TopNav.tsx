@@ -14,7 +14,6 @@ import {
   Info,
   Zap,
   Activity,
-  Play,
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -123,18 +122,6 @@ export const TopNav: React.FC = () => {
           <Activity className="w-3.5 h-3.5 text-amber-200" />
           <span>Simulation Mode</span>
         </button>
-
-        {/* Video Showcase Launcher */}
-        <a
-          href="/video_presentation.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 bg-white hover:bg-stone-100 text-stone-800 font-semibold px-3 py-1.5 rounded-lg text-xs border border-[#E5DFD3] transition-all shadow-xs"
-          title="Open official video presentation with live voiceover suite"
-        >
-          <Play className="w-3.5 h-3.5 text-stone-700 fill-current" />
-          <span>Video Showcase</span>
-        </a>
 
         {/* + Report Grievance Button */}
         <button
